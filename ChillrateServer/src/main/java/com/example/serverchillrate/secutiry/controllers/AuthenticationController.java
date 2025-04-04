@@ -1,5 +1,7 @@
 package com.example.serverchillrate.secutiry.controllers;
 
+import com.example.serverchillrate.dto.AuthResponse;
+import com.example.serverchillrate.dto.UserDto;
 import com.example.serverchillrate.models.User;
 import com.example.serverchillrate.secutiry.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +24,16 @@ public class AuthenticationController {
     private final AuthenticationService service;
     /*
     endpoint для регистрации
-    (Сделать UserDTO и AuthResponse)
     */
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user){
+    public ResponseEntity<AuthResponse> register(@RequestBody UserDto user){
         return ResponseEntity.ok(service.register(user));
     }
     /*
     endpoint для авторизации
-    (Сделать UserDTO и AuthResponse)
     */
     @PostMapping("/authenticate")
-    public ResponseEntity<String> authenticate(@RequestBody User user){
+    public ResponseEntity<AuthResponse> authenticate(@RequestBody UserDto user){
         return ResponseEntity.ok(service.authenticate(user));
     }
 

@@ -1,6 +1,9 @@
 package com.example.serverchillrate.secutiry.service;
 
 
+import com.example.serverchillrate.dto.AuthResponse;
+import com.example.serverchillrate.dto.UserDto;
+import com.example.serverchillrate.dto.UserMapper;
 import com.example.serverchillrate.secutiry.jwt.JwtService;
 import com.example.serverchillrate.secutiry.Role;
 import com.example.serverchillrate.models.User;
@@ -13,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 /*
 Сервер авторизации
-реализуюет регистрацию и авторизацию пользователя
+реализуют регистрацию и авторизацию пользователя
 */
 @Service
 @RequiredArgsConstructor
@@ -28,7 +31,7 @@ public class AuthenticationService {
     request-запрос на добавления пользователя(Нужно сделать класс UserDto)
     результат:string (нужно сделать класс AuthenticateResponse)
     */
-    public String register(User request){
+    public AuthResponse register(UserDto request){
         var user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -37,16 +40,16 @@ public class AuthenticationService {
         if(repository.findByUsername(request.getUsername()).isEmpty()){
             repository.save(user);
             var jwtToken = jwtService.generateToken(user);
-            return jwtToken;
+            return AuthResponse.builder().token(jwtToken).user(UserMapper.INSTANCE.toDto(user)).build();
         }
         throw  new UsernameNotFoundException("User already have");
     }
     /*
-    автооризация пользователя
-    request-запрос на авторизация(Нужно сделать класс UserDto)
+    авторизация пользователя
+    request-запрос на авторизацию(Нужно сделать класс UserDto)
     результат:string (нужно сделать класс AuthenticateResponse)
     */
-    public String authenticate(User request){
+    public AuthResponse authenticate(UserDto request){
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -56,6 +59,6 @@ public class AuthenticationService {
         var user = repository.findByUsername(request.getUsername())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
-        return jwtToken;
+        return AuthResponse.builder().token(jwtToken).user(UserMapper.INSTANCE.toDto(user)).build();
     }
 }
