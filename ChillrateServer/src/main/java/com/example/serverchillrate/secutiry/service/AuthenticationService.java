@@ -32,12 +32,12 @@ public class AuthenticationService {
     результат:string (нужно сделать класс AuthenticateResponse)
     */
     public AuthResponse register(UserDto request){
-        var user = User.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .build();
         if(repository.findByUsername(request.getUsername()).isEmpty()){
+            var user = User.builder()
+                    .username(request.getUsername())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .role(Role.USER)
+                    .build();
             repository.save(user);
             var jwtToken = jwtService.generateToken(user);
             return AuthResponse.builder().token(jwtToken).user(UserMapper.INSTANCE.toDto(user)).build();
@@ -50,15 +50,15 @@ public class AuthenticationService {
     результат:string (нужно сделать класс AuthenticateResponse)
     */
     public AuthResponse authenticate(UserDto request){
+        var user = repository.findByUsername(request.getUsername())
+                .orElseThrow();
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
                         request.getPassword()
                 )
         );
-        var user = repository.findByUsername(request.getUsername())
-                .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         return AuthResponse.builder().token(jwtToken).user(UserMapper.INSTANCE.toDto(user)).build();
-    }
+}
 }
