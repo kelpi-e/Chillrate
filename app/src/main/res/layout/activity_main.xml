@@ -45,62 +45,29 @@
         android:id="@+id/ll_device_state"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:background="@color/colorDevState"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_conversion_absoluteHeight="26dp"
         tools:layout_conversion_absoluteWidth="411dp">
 
-        <TextView
-            android:id="@+id/txt_dev_state_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dev_state_title"
-            android:textColor="@color/colorDevStateTitle"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_conversion_absoluteHeight="19dp"
-            tools:layout_conversion_absoluteWidth="36dp"
-            tools:layout_editor_absoluteX="6dp"
-            tools:layout_editor_absoluteY="0dp" />
 
-        <TextView
-            android:id="@+id/txt_dev_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dev_state_disconnected"
-            android:textColor="@color/colorDevStateValue"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/txt_dev_state_title"
-            tools:layout_conversion_absoluteHeight="19dp"
-            tools:layout_conversion_absoluteWidth="87dp"
-            tools:layout_editor_absoluteX="48dp"
-            tools:layout_editor_absoluteY="0dp" />
-
-        <TextView
-            android:id="@+id/txt_dev_battery_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dev_power_title"
-            android:textColor="@color/colorDevStateTitle"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/txt_dev_battery_power"
-            tools:layout_conversion_absoluteHeight="19dp"
-            tools:layout_conversion_absoluteWidth="43dp" />
-
-        <TextView
-            android:id="@+id/txt_dev_battery_power"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dev_power_empty"
-            android:textColor="@color/colorDevStateValue"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:layout_conversion_absoluteHeight="19dp"
-            tools:layout_conversion_absoluteWidth="6dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/txt_dev_battery_power"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dev_power_empty"
+        android:textColor="@color/colorDevStateValue"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/appBarLayout"
+        tools:layout_conversion_absoluteHeight="19dp"
+        tools:layout_conversion_absoluteWidth="6dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

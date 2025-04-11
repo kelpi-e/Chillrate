@@ -26,7 +26,7 @@
 
     <string name="dev_state_connected">Connected</string>
     <string name="dev_state_disconnected">Disconnected</string>
-    <string name="dev_power_empty">-</string>
+    <string name="dev_power_empty"></string>
     <string name="dev_power_prc">%1$d %%</string>
 
     <string name="alpha">Alpha:</string>

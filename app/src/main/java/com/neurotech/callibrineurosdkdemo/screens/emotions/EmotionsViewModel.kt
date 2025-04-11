@@ -1,5 +1,6 @@
 package com.neurotech.callibrineurosdkdemo.screens.emotions
 
+import android.util.Log
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
@@ -83,11 +84,19 @@ class EmotionsViewModel : ViewModel() {
         }
 
         emotionalMath.lastSpectralData = {
-            alphaText.set("Alpha: " + String.format("%.2f", it.alpha) + "%")
-            betaText.set("Beta: " + String.format("%.2f", it.beta) + "%")
-            gammaText.set("Gamma: " + String.format("%.2f", it.gamma) + "%")
-            thetaText.set("Theta: " + String.format("%.2f", it.theta) + "%")
-            deltaText.set("Delta: " + String.format("%.2f", it.delta) + "%")
+            val alphaValue = String.format("%.2f", it.alpha) + "%"
+            val betaValue = String.format("%.2f", it.beta) + "%"
+            val gammaValue = String.format("%.2f", it.gamma) + "%"
+            val thetaValue = String.format("%.2f", it.theta) + "%"
+            val deltaValue = String.format("%.2f", it.delta) + "%"
+            //
+            alphaText.set("Alpha: $alphaValue")
+            betaText.set("Beta: $betaValue")
+            gammaText.set("Gamma: $gammaValue")
+            thetaText.set("Theta: $thetaValue")
+            deltaText.set("Delta: $deltaValue")
+            //
+            //Log.d("EmotionsViewModel", "Spectral Data - Alpha: $alphaValue, Beta: $betaValue, Gamma: $gammaValue, Theta: $thetaValue, Delta: $deltaValue")
         }
 
         CallibriController.startSignal {

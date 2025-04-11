@@ -41,9 +41,9 @@ class MainActivity : AppCompatActivity() {
 
         CallibriController.connectionStateChanged = {
             runOnUiThread {
-                binding.txtDevState.text =
-                    if (it == SensorState.StateInRange) getString(R.string.dev_state_connected)
-                    else getString(R.string.dev_state_disconnected)
+                //binding.txtDevState.text =
+                    //if (it == SensorState.StateInRange) getString(R.string.dev_state_connected)
+                    //else getString(R.string.dev_state_disconnected)
 
                 if (it == SensorState.StateOutOfRange) {
                     binding.txtDevBatteryPower.text = getString(R.string.dev_power_prc, 0)

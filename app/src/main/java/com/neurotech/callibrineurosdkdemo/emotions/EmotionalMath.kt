@@ -116,6 +116,7 @@ class EmotionalMath(config: EmotionalMathConfig) {
 
     //<editor-fold desc="Calibration">
     fun startCalibration() {
+        Log.d("EmotionsViewModel", "Calibration started")
         Log.d(::EmotionalMath.name, "Calibration started")
 
         brainMath.startCalibration()

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <import type="android.view.View"/>
         <variable
             name="viewModel"
             type="com.neurotech.callibrineurosdkdemo.screens.menu.MenuViewModel" />
@@ -33,28 +33,30 @@
                     android:id="@+id/button_search"
                     android:layout_width="@dimen/button_width"
                     android:layout_height="wrap_content"
-                    android:text="@string/search" />
+                    android:text="@string/search"
+                    android:visibility="@{viewModel.connected ? View.GONE : View.VISIBLE}"/>
 
-                <Button
+                <!--<Button
                     android:id="@+id/button_signal"
                     android:layout_width="@dimen/button_width"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.connected}"
-                    android:text="@string/signal" />
+                    android:text="@string/signal" />-->
 
-                <Button
+                <!--<Button
                     android:id="@+id/button_info"
                     android:layout_width="@dimen/button_width"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.connected}"
-                    android:text="@string/info" />
+                    android:text="@string/info"
+                    android:visibility="@{viewModel.connected ? View.VISIBLE : View.GONE}"/>-->
 
-                <Button
+                <!--<Button
                     android:id="@+id/button_envelope"
                     android:layout_width="@dimen/button_width"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.connected}"
-                    android:text="@string/envelope" />
+                    android:text="@string/envelope" />-->
 
 
                 <Button
@@ -62,28 +64,31 @@
                     android:layout_width="@dimen/button_width"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.connected}"
-                    android:text="@string/emotions" />
+                    android:text="@string/emotions"
+                    android:visibility="@{viewModel.connected ? View.VISIBLE : View.GONE}"/>
 
-                <Button
+                <!--<Button
                     android:id="@+id/button_spectrum"
                     android:layout_width="@dimen/button_width"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.connected}"
-                    android:text="@string/spectrum" />
+                    android:text="@string/spectrum" />-->
 
                 <Button
                     android:id="@+id/button_ecg"
                     android:layout_width="@dimen/button_width"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.connected}"
-                    android:text="@string/ecg" />
+                    android:text="@string/ecg"
+                    android:visibility="@{viewModel.connected ? View.VISIBLE : View.GONE}"/>
 
                 <Button
                     android:id="@+id/button_current_reconect"
                     android:layout_width="@dimen/button_width"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.hasDevice}"
-                    android:text="@{viewModel.connected ? @string/disconnect : @string/connect}" />
+                    android:text="@{viewModel.connected ? @string/disconnect : @string/connect}"
+                    android:visibility="@{viewModel.connected ? View.VISIBLE : View.GONE}"/>
             </LinearLayout>
         </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>

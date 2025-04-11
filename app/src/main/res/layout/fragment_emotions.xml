@@ -23,7 +23,8 @@
             android:text="@{viewModel.started ? @string/stop : @string/start}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:onClick="@{() -> viewModel.onSignalClicked()}" />
 
         <TextView
             android:id="@+id/calibrationProgressTextView"

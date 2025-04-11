@@ -46,36 +46,36 @@ class MenuFragment : Fragment() {
             findNavController().navigate(R.id.action_MenuFragment_to_SearchFragment)
         }
 
-        binding.buttonSignal.setOnClickListener {
+        /*binding.buttonSignal.setOnClickListener {
             if(CallibriController.connectionState == SensorState.StateInRange){
                 findNavController().navigate(R.id.action_MenuFragment_to_signalFragment)
             }
             else {
                 Toast.makeText(requireActivity(), "Connect to device first!", Toast.LENGTH_SHORT).show()
             }
-        }
+        }*/
 
-        binding.buttonInfo.setOnClickListener {
+        /*binding.buttonInfo.setOnClickListener {
             if(CallibriController.connectionState == SensorState.StateInRange){
                 findNavController().navigate(R.id.action_MenuFragment_to_infoFragment)
             }
             else {
                 Toast.makeText(requireActivity(), "Connect to device first!", Toast.LENGTH_SHORT).show()
             }
-        }
+        }*/
 
-        binding.buttonEnvelope.setOnClickListener {
+        /*binding.buttonEnvelope.setOnClickListener {
             if(CallibriController.connectionState == SensorState.StateInRange){
                 findNavController().navigate(R.id.action_MenuFragment_to_envelopeFragment)
             }
             else {
                 Toast.makeText(requireActivity(), "Connect to device first!", Toast.LENGTH_SHORT).show()
             }
-        }
+        }*/
 
-        binding.buttonSpectrum.setOnClickListener {
+        /*binding.buttonSpectrum.setOnClickListener {
             findNavController().navigate(R.id.action_MenuFragment_to_spectrumFragment)
-        }
+        }*/
 
         binding.buttonEcg.setOnClickListener {
             findNavController().navigate(R.id.action_MenuFragment_to_ECGFragment)
