@@ -1,4 +1,4 @@
-![изображение](https://github.com/user-attachments/assets/a982c195-5cbd-4be7-87d6-62c4e8049a11)
+![Ресурс 7@10x](https://github.com/user-attachments/assets/4083b66e-df6d-466f-a6e1-3b6318cc839b)
 
 [Ссылка на макет](https://www.figma.com/design/Uwdvf0r4W9qgSXTUNoxJFM/Untitled?node-id=9-60&t=SQACnfOmLxUuUbu1-1)  
   
