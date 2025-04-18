@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index_style.css">
+  <title>Панель тренера</title>
+</head>
+<body>
+  <header>
+    <h1>ChillRate admin</h1>
+    <nav>
+      <a href="#">Главная</a>
+      <a href="#">Команда</a>
+      <a href="#">Настройки</a>
+      <a href="#">Выйти</a>
+    </nav>
+  </header>
+  <main>
+    <div class="controls">
+      <div class="team-select">
+        <select id="teamSelect">
+          <option value="Все команды">Все команды</option>
+          <option value="Команда A">Команда A</option>
+          <option value="Команда Б">Команда Б</option>
+        </select>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Поиск участника..." />
+      </div>
+      <button class="refresh-btn" onclick="location.reload()">Обновить</button>
+    </div>
+    <div class="summary">
+      <div class="stat">Средняя расслабленность: <span id="avgRelax">—%</span></div>
+      <div>Участников: <span id="totalUsers">0</span></div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Участник</th>
+            <th>Команда</th>
+            <th>Расслабленность</th>
+            <th>Последнее обновление</th>
+            <th>Детали</th>
+          </tr>
+        </thead>
+        <tbody id="userTable"></tbody>
+      </table>
+    </div>
+    <div class="cards" id="userCards"></div>
+  </main>
+  <script src="Info.js"></script>
+</body>
+</html>
