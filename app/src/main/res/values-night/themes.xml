@@ -1,7 +1,0 @@
-<resources>
-    <!-- Base application theme. -->
-    <style name="Theme.CallibriNeuroSDKDemo" parent="Theme.Material3.DynamicColors.DayNight">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-</resources>
