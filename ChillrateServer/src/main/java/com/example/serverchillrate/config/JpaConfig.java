@@ -8,16 +8,17 @@ import javax.sql.DataSource;
 
 @Configuration
 public class JpaConfig {
-
-//Конфигурация подключения к базе данных
-
+/*
+Конфигурация подключения к базе данных
+Данные из переменных окружения
+ */
     @Bean
     public DataSource dataSource(){
         DataSourceBuilder<?> dataSourceBuilder= DataSourceBuilder.create();
         dataSourceBuilder.driverClassName("org.postgresql.Driver");
-        dataSourceBuilder.url("jdbc:postgresql://"+(String)System.getenv("DATABASE_URL"));
-        dataSourceBuilder.username((String)System.getenv("DATABASE_USERNAME"));
-        dataSourceBuilder.password((String)System.getenv("DATABASE_PASSWORD"));
+        dataSourceBuilder.url((String)System.getenv("SPRING_DATASOURCE_URL"));
+        dataSourceBuilder.username((String)System.getenv("SPRING_DATASOURCE_USERNAME"));
+        dataSourceBuilder.password((String)System.getenv("SPRING_DATASOURCE_PASSWORD"));
         return dataSourceBuilder.build();
 
     }
