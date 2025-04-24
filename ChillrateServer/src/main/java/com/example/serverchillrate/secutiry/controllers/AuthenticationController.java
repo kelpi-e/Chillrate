@@ -26,14 +26,13 @@ public class AuthenticationController {
 
     private final AuthenticationService service;
 
-    static final Logger log =
-            LoggerFactory.getLogger(ServerChillRateApplication.class);
+
     /*
     endpoint для регистрации
     */
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody UserDto user){
-        log.info("reg");
+
         return ResponseEntity.ok(service.register(user));
     }
     /*

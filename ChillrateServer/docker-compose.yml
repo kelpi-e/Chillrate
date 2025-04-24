@@ -7,6 +7,8 @@ services:
   db_chillrate:
     image: postgres
     restart: always
+    ports:
+      - "127.0.0.1:5432:5432"
     volumes:
       - pg_chillRate:/var/lib/postgresql/data
     environment:
