@@ -29,7 +29,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests(customer->{
 
                             customer.requestMatchers("/api/v1/auth/**").permitAll();
-                            customer.requestMatchers("/").permitAll();
+                            customer.requestMatchers("/tests/**").permitAll();
                             customer.anyRequest().authenticated();
                         }
                 )

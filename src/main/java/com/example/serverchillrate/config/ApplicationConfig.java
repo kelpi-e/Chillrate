@@ -1,10 +1,10 @@
 package com.example.serverchillrate.config;
 
+import com.example.serverchillrate.models.User;
 import com.example.serverchillrate.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -14,13 +14,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
+
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
     private  final UserRepository repository;
     @Bean
     public UserDetailsService userDetailsService(){
-        return username -> repository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
+        return username -> repository.findByEmail(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
     }
     @Bean
     public  AuthenticationProvider authenticationProvider(){
@@ -36,5 +41,12 @@ public class ApplicationConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
+    }
+    /*
+    Множесство user ожидающих подтверждение почты
+    */
+    @Bean
+    public HashMap<UUID,User> tempSetUser(){
+        return new HashMap<>();
     }
 }
