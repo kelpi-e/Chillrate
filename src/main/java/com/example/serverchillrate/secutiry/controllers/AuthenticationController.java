@@ -8,11 +8,14 @@ import com.example.serverchillrate.secutiry.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.mail.MailException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
 /*
 endpoint для регистрации и авторизации пользователя
 */
@@ -25,15 +28,19 @@ public class AuthenticationController {
      */
 
     private final AuthenticationService service;
-
+    Logger logger=LoggerFactory.getLogger(AuthenticationController.class);
 
     /*
     endpoint для регистрации
     */
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody UserDto user){
-
-        return ResponseEntity.ok(service.register(user));
+        try{
+            return ResponseEntity.ok( service.register(user));
+        }catch (MailException ex){
+            logger.info("Mail exception:"+ex.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     /*
     endpoint для авторизации
@@ -42,6 +49,9 @@ public class AuthenticationController {
     public ResponseEntity<AuthResponse> authenticate(@RequestBody UserDto user){
         return ResponseEntity.ok(service.authenticate(user));
     }
-
-
+    @GetMapping("/confirmMail/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void confirmMail(@PathVariable UUID id){
+        service.confirmMail(id);
+    }
 }

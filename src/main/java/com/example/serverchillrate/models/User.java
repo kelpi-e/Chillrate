@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
+
 /*
 класс пользователь
 используется одновременно как entity для базы данных
@@ -25,8 +27,9 @@ import java.util.List;
 @Entity
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    UUID id;
+    @Column(unique = true)
+    private String email;
     private String username;
     private String  password;
     @Enumerated(EnumType.STRING)
@@ -43,7 +46,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
