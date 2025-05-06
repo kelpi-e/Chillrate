@@ -19,7 +19,7 @@ services:
     build: .
     restart: always
     ports:
-      - 80:8080
+      - 8099:8080
     init: true
     depends_on:
       - db_chillrate
@@ -27,3 +27,7 @@ services:
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_EMAIL=${SPRING_EMAIL}
+      - SPRING_EMAIL_PASSWORD=${SPRING_EMAIL_PASSWORD}
+      - SPRING_HOST=${SPRING_HOST}
+      - SPRING_PORT=${SPRING_PORT}

@@ -25,12 +25,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class User implements UserDetails {
+public class UserApp implements UserDetails {
     @Id
     UUID id;
     @Column(unique = true)
     private String email;
-    private String username;
+    private String name;
     private String  password;
     @Enumerated(EnumType.STRING)
     Role role;
