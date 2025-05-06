@@ -1,5 +1,6 @@
 package com.example.serverchillrate.config;
 
+import com.example.serverchillrate.models.MailData;
 import jakarta.mail.Authenticator;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
@@ -42,5 +43,10 @@ public class SMTPConfig {
         props.put("mail.smtp.connectiontimeout", "1000");
         return mailSender;
     }
-
+    @Bean
+    public MailData mailData(){
+        return MailData.builder().
+                name(System.getenv("SPRING_EMAIL")).
+                password(System.getenv("SPRING_EMAIL_PASSWORD")).build();
+    }
 }

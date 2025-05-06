@@ -4,9 +4,10 @@ package com.example.serverchillrate.secutiry.service;
 import com.example.serverchillrate.dto.AuthResponse;
 import com.example.serverchillrate.dto.UserDto;
 import com.example.serverchillrate.dto.UserMapper;
+import com.example.serverchillrate.models.ServerData;
+import com.example.serverchillrate.models.UserApp;
 import com.example.serverchillrate.secutiry.jwt.JwtService;
 import com.example.serverchillrate.secutiry.Role;
-import com.example.serverchillrate.models.User;
 import com.example.serverchillrate.repository.UserRepository;
 import com.example.serverchillrate.services.EmailService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.UUID;
 
 /*
@@ -27,32 +27,31 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    /*репозиторий пользователей для работы с бд*/
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
-    private final HashMap<UUID,User> tempUsers;
+    private final HashMap<UUID, UserApp> tempUsers;
+    private final ServerData serverData;
     /*
     регистрация нового пользователя
     добавляет нового пользователя с правами доступа USER
     request-запрос на добавления пользователя(Нужно сделать класс UserDto)
     результат:string (нужно сделать класс AuthenticateResponse)
     */
-    public AuthResponse register(UserDto request){
+    public AuthResponse register(UserDto request,Role role){
         if(repository.findByEmail(request.getEmail()).isEmpty()){
-            var user = User.builder()
+            var user = UserApp.builder()
                     .id(UUID.randomUUID())
                     .email(request.getEmail())
-                    .username(request.getUsername())
+                    .name(request.getName())
                     .password(passwordEncoder.encode(request.getPassword()))
-                    .role(Role.USER)
+                    .role(role)
                     .build();
 
-            //(поставить переменную среды SPRING_HOST)
             emailService.SendSimpleMessage(request.getEmail(),"Register for chillrate",
-                    "localhost:8080/api/v1/auth/confirmMail/"+user.getId().toString());
+                    "http://"+serverData.getExternalHost()+":"+serverData.getExternalPort()+"/api/v1/auth/confirmMail/"+user.getId().toString());
             tempUsers.put(user.getId(),user);
             var token=jwtService.generateToken(user);
             return AuthResponse.builder().token(token).user(UserMapper.INSTANCE.toDto(user)).build();
@@ -77,14 +76,14 @@ public class AuthenticationService {
         return AuthResponse.builder().token(jwtToken).user(UserMapper.INSTANCE.toDto(user)).build();
     }
     public  void confirmMail(UUID id){
-       User user=tempUsers.get(id);
+       UserApp user=tempUsers.get(id);
        if(user!=null){
            repository.save(user);
-
            tempUsers.remove(id);
            return;
        }
         throw new UsernameNotFoundException("user not found");
 
     }
+
 }

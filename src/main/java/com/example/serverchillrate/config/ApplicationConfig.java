@@ -1,6 +1,7 @@
 package com.example.serverchillrate.config;
 
-import com.example.serverchillrate.models.User;
+import com.example.serverchillrate.models.ServerData;
+import com.example.serverchillrate.models.UserApp;
 import com.example.serverchillrate.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.UUID;
 
 @Configuration
@@ -46,7 +45,17 @@ public class ApplicationConfig {
     Множесство user ожидающих подтверждение почты
     */
     @Bean
-    public HashMap<UUID,User> tempSetUser(){
+    public HashMap<UUID, UserApp> tempSetUser(){
+
         return new HashMap<>();
     }
+    @Bean
+    public ServerData serverData(){
+        return ServerData.builder().
+                externalHost(System.getenv("SPRING_HOST")).
+                externalPort(System.getenv("SPRING_PORT")).build();
+    }
 }
+
+
+
