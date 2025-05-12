@@ -16,7 +16,14 @@ public class JpaConfig {
     public DataSource dataSource(){
         DataSourceBuilder<?> dataSourceBuilder= DataSourceBuilder.create();
         dataSourceBuilder.driverClassName("org.postgresql.Driver");
-        dataSourceBuilder.url((String)System.getenv("SPRING_DATASOURCE_URL"));
+        //url при работы приложения из докера
+        String url=((String)System.getenv("SPRING_DATASOURCE_URL"));
+        //не найдено url для докера
+        if(url==null){
+            //url при работе локально
+            url="jdbc:postgresql://localhost:5432/chillRate_db";
+        }
+        dataSourceBuilder.url(url);
         dataSourceBuilder.username((String)System.getenv("SPRING_DATASOURCE_USERNAME"));
         dataSourceBuilder.password((String)System.getenv("SPRING_DATASOURCE_PASSWORD"));
         return dataSourceBuilder.build();

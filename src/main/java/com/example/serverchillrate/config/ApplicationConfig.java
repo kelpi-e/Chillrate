@@ -2,6 +2,7 @@ package com.example.serverchillrate.config;
 
 import com.example.serverchillrate.models.ServerData;
 import com.example.serverchillrate.models.UserApp;
+import com.example.serverchillrate.models.UserTemp;
 import com.example.serverchillrate.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -45,8 +46,7 @@ public class ApplicationConfig {
     Множесство user ожидающих подтверждение почты
     */
     @Bean
-    public HashMap<UUID, UserApp> tempSetUser(){
-
+    public HashMap<UUID, UserTemp> tempSetUser(){
         return new HashMap<>();
     }
     @Bean

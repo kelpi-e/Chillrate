@@ -3,7 +3,8 @@ package com.example.serverchillrate.secutiry.controllers;
 import com.example.serverchillrate.dto.AuthResponse;
 import com.example.serverchillrate.dto.UserDto;
 import com.example.serverchillrate.secutiry.Role;
-import com.example.serverchillrate.secutiry.service.AuthenticationService;
+import com.example.serverchillrate.secutiry.service.AuthService;
+import com.example.serverchillrate.secutiry.service.impl.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class AuthenticationController {
     сервис, реализующий регистрацию и авторизацию пользователей
      */
 
-    private final AuthenticationService service;
+    private final AuthService service;
     Logger logger=LoggerFactory.getLogger(AuthenticationController.class);
 
     /*
@@ -52,6 +53,7 @@ public class AuthenticationController {
     public void confirmMail(@PathVariable UUID id){
         service.confirmMail(id);
     }
+
     @PostMapping("/regAdmin")
     public ResponseEntity<AuthResponse> regAdmin(@RequestBody UserDto user){
         try{
