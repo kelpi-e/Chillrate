@@ -21,7 +21,7 @@ JWT service
  */
 @Service
 public class JwtService {
-    private static final String SECRET_KEY="65d37a50e138d5e68482e3b65fb729b0d22b226b279be74ad209d88e5e6c1d7d";
+    private static final String SECRET_KEY=System.getenv("SECRET_KEY");
     //генерация токена: токен действует 1 день
     public String generateToken(Map<String,Object> extraClaims, UserDetails userDetails){
         return Jwts.builder()
