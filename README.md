@@ -7,4 +7,4 @@ Figma link: https://www.figma.com/design/Uwdvf0r4W9qgSXTUNoxJFM/Untitled?node-id
 api/v1/auth/regAdmin -регистрация тренера (method:post,body:{email,password,name})
 api/v1/auth/register -регистрация пользователя (method:post,body:{email,password,name})
 api/v1/auth/authenticate -авторизация (method:post,body:{email,password})
-api/v1/test -тестовый endpoint,закрыт для незарегистрированных пользователей(method:get,headers:{Authorization:Client <jwt>})
+api/v1/test -тестовый endpoint,закрыт для незарегистрированных пользователей(method:get,headers:{Authorization:Client ~jwt~})
