@@ -24,6 +24,9 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
+    implementation("com.googlecode.json-simple:json-simple:1.1.1")
+    implementation("org.springframework.integration:spring-integration-ip:6.0.0")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail
     implementation("org.springframework.boot:spring-boot-starter-mail:3.4.4")
     implementation("io.jsonwebtoken:jjwt:0.12.5")
