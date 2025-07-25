@@ -1,6 +1,7 @@
 package com.example.serverchillrate.secutiry.service;
 
 import com.example.serverchillrate.models.UserApp;
+import org.mapstruct.control.MappingControl;
 import org.springframework.boot.autoconfigure.pulsar.PulsarProperties;
 
 public interface UdpServiceSecure {
@@ -11,6 +12,7 @@ public interface UdpServiceSecure {
     ///@param userApp
     ///@param jwt
     void addClientData(UserApp userApp,String jwt);
+    void addJwtToClient(String jwt, UserApp userApp);
     ///@brief check  jwt
     ///@param jwt
     ///@return true - all ok,false not ok
@@ -19,4 +21,5 @@ public interface UdpServiceSecure {
     /// jwt not valid -return false
     /// else true
     boolean checkToken(String jwt);
+    UserApp getAdminFromToken(String jwt);
 }

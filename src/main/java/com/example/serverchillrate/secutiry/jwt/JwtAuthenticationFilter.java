@@ -41,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
             return;
         }
+        try{
         final String jwt=authHeader.substring(7);
 
         var userEmail= jwtService.extractUsername(jwt);
@@ -55,6 +56,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 udpServiceSecure.addClientData((UserApp) userDetails,jwt);
             }
+        }
+        }
+        catch (Exception exception){
+            logger.error(exception.getMessage());
+
         }
         filterChain.doFilter(request,response);
     }

@@ -19,7 +19,7 @@ services:
     build: .
     restart: always
     ports:
-      - 8099:8080
+      - 8099:8090
     init: true
     depends_on:
       - db_chillrate

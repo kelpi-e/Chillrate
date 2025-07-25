@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Configuration
@@ -53,8 +55,8 @@ public class ApplicationConfig {
     @Bean
     public ServerData serverData(){
         return ServerData.builder().
-                externalHost(System.getenv("SPRING_HOST")).
-                externalPort(System.getenv("SPRING_PORT")).build();
+                externalHost(System.getenv("SPRING_HOST")==null?"localhost":System.getenv("SPRING_HOST")).
+                externalPort(System.getenv("SPRING_PORT")==null?"8090":System.getenv("SPRING_PORT")).build();
     }
     /// @brief bean for mapping user data by jwt
     /// @details key-jwt value - list userData
@@ -66,6 +68,12 @@ public class ApplicationConfig {
     /// @details key-jwt value-UUID
     @Bean
     public HashMap<String,UUID> jwtTOUUid(){return  new HashMap<>();}
+    ///@brief bean to temp client
+    ///@details key-id admin value- set client ID
+    @Bean
+    public HashMap<UUID,HashSet<UserTemp>> AdminToTempClients(){
+        return new HashMap<>();
+    }
 
 }
 
