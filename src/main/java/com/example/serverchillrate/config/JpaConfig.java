@@ -21,7 +21,7 @@ public class JpaConfig {
         //не найдено url для докера
         if(url==null){
             //url при работе локально
-            url="jdbc:postgresql://localhost:5432/chillRate_db";
+            url="jdbc:postgresql://localhost:5432/chillrate_db";
         }
         dataSourceBuilder.url(url);
         dataSourceBuilder.username((String)System.getenv("SPRING_DATASOURCE_USERNAME"));

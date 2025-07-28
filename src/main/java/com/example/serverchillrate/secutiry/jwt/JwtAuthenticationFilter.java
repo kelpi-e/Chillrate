@@ -1,5 +1,7 @@
 package com.example.serverchillrate.secutiry.jwt;
 
+import com.example.serverchillrate.models.UserApp;
+import com.example.serverchillrate.secutiry.service.UdpServiceSecure;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +29,7 @@ value=Client <token>
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final UdpServiceSecure udpServiceSecure;
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -38,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
             return;
         }
+        try{
         final String jwt=authHeader.substring(7);
 
         var userEmail= jwtService.extractUsername(jwt);
@@ -50,7 +54,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                udpServiceSecure.addClientData((UserApp) userDetails,jwt);
             }
+        }
+        }
+        catch (Exception exception){
+            logger.error(exception.getMessage());
+
         }
         filterChain.doFilter(request,response);
     }

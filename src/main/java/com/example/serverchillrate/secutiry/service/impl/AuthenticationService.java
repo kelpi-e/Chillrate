@@ -4,6 +4,7 @@ package com.example.serverchillrate.secutiry.service.impl;
 import com.example.serverchillrate.dto.AuthResponse;
 import com.example.serverchillrate.dto.UserDto;
 import com.example.serverchillrate.dto.UserMapper;
+import com.example.serverchillrate.models.PairUserAndData;
 import com.example.serverchillrate.models.ServerData;
 import com.example.serverchillrate.models.UserApp;
 import com.example.serverchillrate.models.UserTemp;
@@ -11,6 +12,7 @@ import com.example.serverchillrate.secutiry.jwt.JwtService;
 import com.example.serverchillrate.secutiry.Role;
 import com.example.serverchillrate.repository.UserRepository;
 import com.example.serverchillrate.secutiry.service.AuthService;
+import com.example.serverchillrate.secutiry.service.UdpServiceSecure;
 import com.example.serverchillrate.services.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,9 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 /*
 Сервер авторизации
@@ -37,6 +37,8 @@ public class AuthenticationService implements AuthService {
     private final EmailService emailService;
     private final HashMap<UUID, UserTemp> tempUsers;
     private final ServerData serverData;
+    private final UdpServiceSecure udpServiceSecure;
+    private final HashMap<UUID, HashSet<UserTemp>> adminUsersTemp;
     /*
     регистрация нового пользователя
     добавляет нового пользователя с правами доступа USER
@@ -57,6 +59,7 @@ public class AuthenticationService implements AuthService {
                     "http://"+serverData.getExternalHost()+":"+serverData.getExternalPort()+"/api/v1/auth/confirmMail/"+user.getId().toString());
             tempUsers.put(user.getId(),new UserTemp(user,new Date()));
             var token=jwtService.generateToken(user);
+            udpServiceSecure.addJwtToClient(token,user);
             return AuthResponse.builder().token(token).user(UserMapper.INSTANCE.toDto(user)).build();
         }
         throw  new UsernameNotFoundException("User already have");
@@ -69,7 +72,7 @@ public class AuthenticationService implements AuthService {
     public AuthResponse authenticate(UserDto request)throws UsernameNotFoundException{
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow(()->new UsernameNotFoundException("not found user"));
-        if(!user.getPassword().equals(request.getPassword())){
+        if(!user.getPassword().equals(passwordEncoder.encode( request.getPassword()))){
             throw new UsernameNotFoundException("password not equals");
         }
         authenticationManager.authenticate(
@@ -79,6 +82,11 @@ public class AuthenticationService implements AuthService {
                 )
         );
         var jwtToken = jwtService.generateToken(user);
+        udpServiceSecure.addClientData(user,jwtToken);
+        udpServiceSecure.addJwtToClient(jwtToken,user);
+        if(user.getRole()==Role.ADMIN &&!adminUsersTemp.containsKey(user.getId())){
+            adminUsersTemp.put(user.getId(),new HashSet<>());
+        }
         return AuthResponse.builder().token(jwtToken).user(UserMapper.INSTANCE.toDto(user)).build();
     }
     /*
@@ -90,7 +98,11 @@ public class AuthenticationService implements AuthService {
        UserTemp userTemp=tempUsers.get(id);
        if(userTemp!=null){
            repository.save(userTemp.getUser());
+           udpServiceSecure.addClientData(userTemp.getUser(),null);
            tempUsers.remove(id);
+           if(userTemp.getUser().getRole()==Role.ADMIN){
+               adminUsersTemp.put(userTemp.getUser().getId(),new HashSet<>());
+           }
            return;
        }
         throw new UsernameNotFoundException("user not found");
