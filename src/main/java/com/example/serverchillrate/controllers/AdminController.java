@@ -18,13 +18,13 @@ import java.util.UUID;
 public class AdminController {
     private final TeamClientService service;
     private final CRUDTeam crudTeam;
-    @GetMapping("/confirm/{teamId}/{userId}")
+    @GetMapping("/team/{teamId}/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public TeamDto confirmToTeam(@PathVariable Long teamId, @PathVariable UUID userId){
         String email= SecurityContextHolder.getContext().getAuthentication().getName();
         return TeamMapper.INSTANCE.toDto( service.addUser(teamId,userId,email));
     }
-    @DeleteMapping("/deleteUser/{teamId}/{userId}")
+    @DeleteMapping("/team/{teamId}/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public TeamDto deleteUserToTeam(@PathVariable Long teamId,@PathVariable UUID userId){
         String email=SecurityContextHolder.getContext().getAuthentication().getName();
