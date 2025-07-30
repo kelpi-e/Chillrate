@@ -1,5 +1,6 @@
 package com.example.serverchillrate.models;
 
+import com.example.serverchillrate.entity.UserApp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

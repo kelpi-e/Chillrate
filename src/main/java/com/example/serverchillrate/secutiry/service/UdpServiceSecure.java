@@ -1,8 +1,6 @@
 package com.example.serverchillrate.secutiry.service;
 
-import com.example.serverchillrate.models.UserApp;
-import org.mapstruct.control.MappingControl;
-import org.springframework.boot.autoconfigure.pulsar.PulsarProperties;
+import com.example.serverchillrate.entity.UserApp;
 
 public interface UdpServiceSecure {
     ///@brief add userId and user to hashmap,add jwt and uuid to hashmap

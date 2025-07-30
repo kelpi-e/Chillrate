@@ -1,8 +1,9 @@
 package com.example.serverchillrate.models;
 
+import com.example.serverchillrate.entity.UserApp;
+import com.example.serverchillrate.entity.UserData;
 import lombok.Builder;
 import lombok.Data;
-import org.junit.experimental.theories.DataPoints;
 
 import java.util.List;
 

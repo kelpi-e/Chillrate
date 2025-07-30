@@ -1,6 +1,6 @@
 package com.example.serverchillrate.repository;
 
-import com.example.serverchillrate.models.UserApp;
+import com.example.serverchillrate.entity.UserApp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

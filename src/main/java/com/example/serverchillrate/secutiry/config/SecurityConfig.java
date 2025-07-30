@@ -1,5 +1,6 @@
 package com.example.serverchillrate.secutiry.config;
 
+import com.example.serverchillrate.secutiry.Role;
 import com.example.serverchillrate.secutiry.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 /*
@@ -27,9 +29,12 @@ public class SecurityConfig{
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(customer->{
-
+                            customer.requestMatchers("/swagger-ui/**").permitAll();
                             customer.requestMatchers("/api/v1/auth/**").permitAll();
                             customer.requestMatchers("/tests/**").permitAll();
+                            customer.requestMatchers("/api/v1/team/**").hasAuthority(Role.ADMIN.name());
+                            customer.requestMatchers("/api/v1/admin/**").hasAuthority(Role.ADMIN.name());
+
                             customer.anyRequest().authenticated();
                         }
                 )

@@ -1,13 +1,14 @@
 package com.example.serverchillrate.secutiry.service.impl;
 
 import com.example.serverchillrate.models.PairUserAndData;
-import com.example.serverchillrate.models.UserApp;
+import com.example.serverchillrate.entity.UserApp;
 import com.example.serverchillrate.repository.UserRepository;
 import com.example.serverchillrate.secutiry.jwt.JwtService;
 import com.example.serverchillrate.secutiry.service.UdpServiceSecure;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public class UdpServiceSecureImpl implements UdpServiceSecure {
     @Override
     public void addClientData(UserApp userApp, String jwt) {
         if(!uuidToData.containsKey(userApp.getId())){
-            uuidToData.put(userApp.getId(),PairUserAndData.builder().build());
+            uuidToData.put(userApp.getId(),PairUserAndData.builder().user(userApp).userData(new ArrayList<>()).build());
         }
 
 
@@ -44,7 +45,7 @@ public class UdpServiceSecureImpl implements UdpServiceSecure {
            jwtTOUuid.remove(jwt);
            return false;
        }
-       var userDetails= uuidToData.get(uuid).getUser();
+        var userDetails= uuidToData.get(uuid).getUser();
        if(!jwtService.isTokenValid(jwt,userDetails)){
            jwtTOUuid.remove(jwt);
            return false;

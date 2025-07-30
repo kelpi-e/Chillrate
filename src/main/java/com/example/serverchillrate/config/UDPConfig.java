@@ -1,12 +1,15 @@
 package com.example.serverchillrate.config;
 
+import com.example.serverchillrate.dto.UserDataMapper;
+import com.example.serverchillrate.dto.UserMapper;
 import com.example.serverchillrate.models.PairUserAndData;
-import com.example.serverchillrate.models.UserData;
+import com.example.serverchillrate.entity.UserData;
 
 import com.example.serverchillrate.repository.UserDataRepository;
 import com.example.serverchillrate.secutiry.Role;
 import com.example.serverchillrate.secutiry.service.UdpServiceSecure;
 import com.example.serverchillrate.services.CRUDTeam;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -21,7 +24,6 @@ import org.springframework.integration.ip.dsl.Udp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /// @ struct configuration Udp server (Test working as echo)
@@ -45,28 +47,27 @@ public class UDPConfig {
 
         return IntegrationFlow.from(Udp.inboundAdapter(8080).id("udpIn"))
                 .<byte[], String>transform((p) -> {
-                    logger.info(new String(p));
+                    String request=new String(p);
+                    logger.info(request);
                     try{
-                    JSONObject jsonObject=(JSONObject) JSONValue.parse(new String(p));
+                    JSONObject jsonObject=(JSONObject) JSONValue.parse(request);
                     logger.info(jsonObject.toJSONString());
                     String jwt=(String)jsonObject.get("jwt");
-
                     if(!serviceSecure.checkToken(jwt))
                         return "jwt Invalid";
-
-
-                    String dateStr=(String) jsonObject.get("datetime");
+                    String dateStr=(String) jsonObject.get("dateTime");
                     SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date datetime=simpleDateFormat.parse(dateStr);
                     var dataDetails=uuidToData.get( jwtTOUuid.get(jwt));
                     UserData userData=UserData.builder().
                             _user(dataDetails.getUser())
                             .dateTime(datetime)
-                            .data((String) jsonObject.get("data"))
+                            .data((String)jsonObject.get("data"))
                             .build();
                     repository.save(userData);
                     dataDetails.userData.add(userData);
                     }catch (Exception exception){
+                        logger.info(exception.getMessage());
                         return "parse exception";
                     }
                    return "OK";
@@ -91,37 +92,60 @@ public class UDPConfig {
                         String jwt = (String) jsonObject.get("jwt");
                         var admin=serviceSecure.getAdminFromToken(jwt);
                         if(admin.getRole()!= Role.ADMIN){
-                            return "it is not admin";
+                            return "He is not admin";
                         }
                         var listTeam=crudTeam.getListTeam(admin);
                         StringBuilder stringBuilder=new StringBuilder();
                         stringBuilder.append('{');
-                        boolean[] first ={true,true};
-                        listTeam.forEach(c->{
-                            if(!first[0]){
+                        ObjectMapper objectMapper=new ObjectMapper();
+
+                        boolean[] firsts={true,true,true};
+
+                        for (var team : listTeam) {
+                            if(!firsts[0]){
                                 stringBuilder.append(',');
                             }
-                            first[0]=false;
-                           stringBuilder.append('"');
-                           stringBuilder.append( c.getName());
-                           stringBuilder.append('"');
-                           stringBuilder.append(":{");
-                           first[1]=true;
-                           c.getClients().forEach(userApp -> {
-                               if(!first[1]){
-                                   stringBuilder.append(',');
-                               }
-                                first[1]=false;
-                               stringBuilder.append('"');
-                               stringBuilder.append(c.getId().toString());
-                               stringBuilder.append('"');
-                               stringBuilder.append(":");
-                               stringBuilder.append(JSONArray.toJSONString(uuidToData.get(userApp.getId()).userData));
+                            firsts[0]=false;
+                            stringBuilder.append('"');
+                            stringBuilder.append(team.getId().toString());
+                            stringBuilder.append('"');
+                            stringBuilder.append(":{");
+                            firsts[1]=true;
 
-                           });
+
+                            for (var client : team.getClients()) {
+                                try {
+                                    StringBuilder userStr = new StringBuilder();
+                                    if (!firsts[1]) {
+                                        userStr.append(',');
+                                    }
+                                    firsts[1] = false;
+                                    userStr.append('"');
+                                    userStr.append(client.getEmail());
+                                    userStr.append('"');
+                                    userStr.append(":");
+                                    userStr.append("[");
+                                    var ListData = uuidToData.get(client.getId()).userData;
+                                    firsts[2] = true;
+                                    for (var data : ListData) {
+                                        if (!firsts[2]) {
+                                            userStr.append(",");
+                                        }
+                                        firsts[2] = false;
+                                        userStr.append(objectMapper.writeValueAsString(UserDataMapper.INSTANCE.toDto(data)));
+                                    }
+                                    userStr.append("]");
+                                    stringBuilder.append(userStr);
+                                }
+                                catch (Exception ignored){
+
+                                }
+                            }
+
+
                             stringBuilder.append("}");
-                        });
-                        stringBuilder.append('}');
+                        }
+                        stringBuilder.append("}");
                         return stringBuilder.toString();
                     }
                     catch (Exception exception){

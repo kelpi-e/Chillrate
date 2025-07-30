@@ -2,7 +2,6 @@ package com.example.serverchillrate.config;
 
 import com.example.serverchillrate.models.PairUserAndData;
 import com.example.serverchillrate.models.ServerData;
-import com.example.serverchillrate.models.UserApp;
 import com.example.serverchillrate.models.UserTemp;
 import com.example.serverchillrate.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Configuration

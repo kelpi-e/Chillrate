@@ -1,6 +1,7 @@
 package com.example.serverchillrate.controllers;
 
 import com.example.serverchillrate.services.TeamClientService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;

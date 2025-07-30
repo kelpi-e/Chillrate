@@ -1,17 +1,14 @@
 package com.example.serverchillrate.services.impl;
 
-import com.example.serverchillrate.models.Team;
-import com.example.serverchillrate.models.UserApp;
+import com.example.serverchillrate.entity.Team;
 import com.example.serverchillrate.models.UserTemp;
 import com.example.serverchillrate.repository.TeamRepository;
 import com.example.serverchillrate.repository.UserRepository;
 import com.example.serverchillrate.services.TeamClientService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,12 +21,15 @@ public class TeamClientServiceImpl implements TeamClientService {
     private final UserRepository userRepository;
     private final HashMap<UUID,HashSet<UserTemp>> adminTempUser;
     @Override
-    public Team addUser(Long teamId, UUID clientId, String emailAdmin) {
+    public Team addUser(Long teamId, String emailUser, String emailAdmin) {
         var admin=userRepository.findByEmail(emailAdmin).orElseThrow();
-        var client=userRepository.findById(clientId).orElseThrow();
+        var client=userRepository.findByEmail(emailUser).orElseThrow();
         var team= repository.findById(teamId).orElseThrow();
         if(team.getAdmin()!=admin){
             throw new UsernameNotFoundException("it not admin team");
+        }
+        if(team.getClients().stream().anyMatch(c->c.getEmail().equals(emailUser))){
+            throw new UsernameNotFoundException("He already have in team");
         }
         if(adminTempUser.get(admin.getId()).stream().anyMatch(c->c.getUser().equals(client))){
             adminTempUser.get(admin.getId()).removeIf(c->c.getUser().equals(client));
@@ -43,21 +43,22 @@ public class TeamClientServiceImpl implements TeamClientService {
 
     @Override
     public void addUserToWait(String emailClient,UUID adminId) {
-        if(!adminTempUser.containsKey(adminId)){
-            throw new UsernameNotFoundException("not found admin");
+        var admin=userRepository.findById(adminId).orElseThrow();
+        if(!adminTempUser.containsKey(admin.getId())){
+            adminTempUser.put(adminId,new HashSet<>());
         }
         var client=userRepository.findByEmail(emailClient).orElseThrow();
         adminTempUser.get(adminId).add(new UserTemp(client, new Date()));
     }
 
     @Override
-    public Team deleteUser(Long teamId, UUID clientId,String emailAdmin) {
+    public Team deleteUser(Long teamId,String emailUser,String emailAdmin) {
         var team= repository.findById(teamId).orElseThrow();
         var admin=userRepository.findByEmail(emailAdmin).orElseThrow();
         if(team.getAdmin()!=admin){
             throw new UsernameNotFoundException("it not admin team");
         }
-        team.getClients().remove(userRepository.findById(clientId).orElseThrow());
+        team.getClients().remove(userRepository.findByEmail(emailUser).orElseThrow());
         repository.save(team);
         return team;
     }

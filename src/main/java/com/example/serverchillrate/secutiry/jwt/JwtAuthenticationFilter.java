@@ -1,6 +1,6 @@
 package com.example.serverchillrate.secutiry.jwt;
 
-import com.example.serverchillrate.models.UserApp;
+import com.example.serverchillrate.entity.UserApp;
 import com.example.serverchillrate.secutiry.service.UdpServiceSecure;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

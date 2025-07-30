@@ -1,4 +1,4 @@
-package com.example.serverchillrate.models;
+package com.example.serverchillrate.entity;
 
 import com.example.serverchillrate.secutiry.Role;
 import jakarta.persistence.*;

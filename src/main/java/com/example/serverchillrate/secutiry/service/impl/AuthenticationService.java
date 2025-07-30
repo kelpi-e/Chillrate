@@ -4,9 +4,8 @@ package com.example.serverchillrate.secutiry.service.impl;
 import com.example.serverchillrate.dto.AuthResponse;
 import com.example.serverchillrate.dto.UserDto;
 import com.example.serverchillrate.dto.UserMapper;
-import com.example.serverchillrate.models.PairUserAndData;
 import com.example.serverchillrate.models.ServerData;
-import com.example.serverchillrate.models.UserApp;
+import com.example.serverchillrate.entity.UserApp;
 import com.example.serverchillrate.models.UserTemp;
 import com.example.serverchillrate.secutiry.jwt.JwtService;
 import com.example.serverchillrate.secutiry.Role;
@@ -72,7 +71,7 @@ public class AuthenticationService implements AuthService {
     public AuthResponse authenticate(UserDto request)throws UsernameNotFoundException{
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow(()->new UsernameNotFoundException("not found user"));
-        if(!user.getPassword().equals(passwordEncoder.encode( request.getPassword()))){
+        if(!passwordEncoder.matches(request.getPassword(),user.getPassword())){
             throw new UsernameNotFoundException("password not equals");
         }
         authenticationManager.authenticate(

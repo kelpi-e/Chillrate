@@ -11,5 +11,5 @@ import java.util.UUID;
 public class TeamDto {
     Long id;
     String name;
-    List<UUID> clients;
+    List<UserDto> clients;
 }
