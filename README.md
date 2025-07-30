@@ -38,9 +38,9 @@ api/v1/team/{id} удаление команды(method:delete)
 <p>
 api/v1/team/{id} поучить данные о команде(method:get)
 <p>
-api/v1/admin/url получить ссылку на подключение 
+api/v1/admin/url получить ссылку на подключение (method:get)
 <p>
-api/v1/admin/waitUsers получить пользователей ожидающих распределения
+api/v1/admin/waitUsers получить пользователей ожидающих распределения (mnethod:get)
 <p>
 UDP ENDPOINT:
 <p>
