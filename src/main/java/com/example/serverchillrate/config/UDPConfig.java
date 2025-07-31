@@ -49,6 +49,7 @@ public class UDPConfig {
                 .<byte[], String>transform((p) -> {
                     String request=new String(p);
                     logger.info(request);
+                    String dataField="data";
                     try{
                     JSONObject jsonObject=(JSONObject) JSONValue.parse(request);
                     logger.info(jsonObject.toJSONString());
@@ -62,7 +63,7 @@ public class UDPConfig {
                     UserData userData=UserData.builder().
                             _user(dataDetails.getUser())
                             .dateTime(datetime)
-                            .data((String)jsonObject.get("data"))
+                            .data(request.substring(request.indexOf(dataField)+dataField.length()+3,request.length()-1))
                             .build();
                     repository.save(userData);
                     dataDetails.userData.add(userData);
