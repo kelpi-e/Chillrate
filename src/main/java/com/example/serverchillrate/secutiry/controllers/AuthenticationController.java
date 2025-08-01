@@ -18,6 +18,7 @@ import java.util.UUID;
 /*
 endpoint для регистрации и авторизации пользователя
 */
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -44,6 +45,7 @@ public class AuthenticationController {
     /*
     endpoint для авторизации
     */
+
     @PostMapping("/authenticate")
     public ResponseEntity<AuthResponse> authenticate(@RequestBody UserDto user) {
         return ResponseEntity.ok(service.authenticate(user));

@@ -24,7 +24,9 @@ repositories {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations
+
+    // https:/
+    // /mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations
     implementation("io.swagger.core.v3:swagger-annotations:2.0.2")
     // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
     implementation("com.googlecode.json-simple:json-simple:1.1.1")

@@ -13,6 +13,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+
 /*
 конфигурация для security
 указаваем к каким ресурсам какая авторизация нужна
@@ -34,10 +39,18 @@ public class SecurityConfig{
                             customer.requestMatchers("/tests/**").permitAll();
                             customer.requestMatchers("/api/v1/team/**").hasAuthority(Role.ADMIN.name());
                             customer.requestMatchers("/api/v1/admin/**").hasAuthority(Role.ADMIN.name());
-
                             customer.anyRequest().authenticated();
                         }
                 )
+                .cors(httpSecurityCorsConfigurer -> {
+                    CorsConfiguration configuration = new CorsConfiguration();
+                    configuration.setAllowedOrigins(Arrays.asList("*"));
+                    configuration.setAllowedMethods(Arrays.asList("*"));
+                    configuration.setAllowedHeaders(Arrays.asList("*"));
+                    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                    source.registerCorsConfiguration("/**", configuration);
+                    httpSecurityCorsConfigurer.configurationSource(source);
+                })
                 .sessionManagement(customer->{
                     customer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
                 })

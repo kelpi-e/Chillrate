@@ -5,8 +5,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring",unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserDataMapper {
     UserDataMapper INSTANCE= Mappers.getMapper(UserDataMapper.class);
     UserDataDto toDto(UserData entity);
+    List<UserDataDto> toListDto(List<UserData> listEntity);
 }
