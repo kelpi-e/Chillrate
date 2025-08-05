@@ -32,7 +32,8 @@ public class UserApp implements UserDetails {
     private String email;
     private String name;
     private String  password;
-    @Enumerated(EnumType.STRING)
+
+    @Enumerated(EnumType.ORDINAL)
     Role role;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
