@@ -2,6 +2,7 @@ package com.example.serverchillrate.controllers;
 
 import com.example.serverchillrate.ServerChillRateApplication;
 import com.example.serverchillrate.services.EmailService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class PublicController {
             emailService.SendSimpleMessage(email,"hello","hello");
 
         }
-        catch (MailException exception){
+        catch (Exception exception){
             log.info("MailException: "+exception.getMessage());
             return new ResponseEntity<>("Unable to send email", HttpStatus.INTERNAL_SERVER_ERROR);
         }

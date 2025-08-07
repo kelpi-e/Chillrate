@@ -13,6 +13,7 @@ import com.example.serverchillrate.repository.UserRepository;
 import com.example.serverchillrate.secutiry.service.AuthService;
 import com.example.serverchillrate.secutiry.service.UdpServiceSecure;
 import com.example.serverchillrate.services.EmailService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,23 +45,24 @@ public class AuthenticationService implements AuthService {
     request-запрос на добавления пользователя(Нужно сделать класс UserDto)
     результат:string (нужно сделать класс AuthenticateResponse)
     */
-    public AuthResponse register(UserDto request,Role role)throws  UsernameNotFoundException{
-        if(repository.findByEmail(request.getEmail()).isEmpty()){
-            var user = UserApp.builder()
-                    .id(UUID.randomUUID())
-                    .email(request.getEmail())
-                    .name(request.getName())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .role(role)
-                    .build();
+    public AuthResponse register(UserDto request,Role role) throws UsernameNotFoundException {
+            if (repository.findByEmail(request.getEmail()).isEmpty()) {
+                var user = UserApp.builder()
+                        .id(UUID.randomUUID())
+                        .email(request.getEmail())
+                        .name(request.getName())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .role(role)
+                        .build();
 
-            emailService.SendSimpleMessage(request.getEmail(),"Register for chillrate",
-                    "http://"+serverData.getExternalHost()+":"+serverData.getExternalPort()+"/api/v1/auth/confirmMail/"+user.getId().toString());
-            tempUsers.put(user.getId(),new UserTemp(user,new Date()));
-            var token=jwtService.generateToken(user);
-            udpServiceSecure.addJwtToClient(token,user);
-            return AuthResponse.builder().token(token).user(UserMapper.INSTANCE.toDto(user)).build();
-        }
+                emailService.SendSimpleMessage(request.getEmail(), "Register for chillrate",
+                        "http://" + serverData.getExternalHost() + ":" + serverData.getExternalPort() + "/api/v1/auth/confirmMail/" + user.getId().toString());
+                tempUsers.put(user.getId(), new UserTemp(user, new Date()));
+                var token = jwtService.generateToken(user);
+                udpServiceSecure.addJwtToClient(token, user);
+                return AuthResponse.builder().token(token).user(UserMapper.INSTANCE.toDto(user)).build();
+            }
+
         throw  new UsernameNotFoundException("User already have");
     }
     /*

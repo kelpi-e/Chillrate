@@ -5,6 +5,7 @@ import com.example.serverchillrate.dto.UserDto;
 import com.example.serverchillrate.secutiry.Role;
 import com.example.serverchillrate.secutiry.service.AuthService;
 import com.example.serverchillrate.secutiry.service.impl.AuthenticationService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +35,8 @@ public class AuthenticationController {
     endpoint для регистрации
     */
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody UserDto user){
-        try{
-            return ResponseEntity.ok( service.register(user, Role.USER));
-        }catch (MailException ex){
-            logger.info("Mail exception:"+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<AuthResponse> register(@RequestBody UserDto user) throws MessagingException {
+        return ResponseEntity.ok( service.register(user, Role.USER));
     }
     /*
     endpoint для авторизации
@@ -57,12 +53,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/regAdmin")
-    public ResponseEntity<AuthResponse> regAdmin(@RequestBody UserDto user){
-        try{
-            return ResponseEntity.ok( service.register(user, Role.ADMIN));
-        }catch (MailException ex){
-            logger.info("Mail exception:"+ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<AuthResponse> regAdmin(@RequestBody UserDto user) throws MessagingException {
+        return ResponseEntity.ok( service.register(user, Role.ADMIN));
+
     }
 }

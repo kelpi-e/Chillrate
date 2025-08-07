@@ -39,8 +39,8 @@ public class SMTPConfig {
         props.put("mail.smtp.ssl.protocols","TLSv1.2");
         props.put("mail.smtp.ssl.enable","true");
         props.put("mail.smtp.ssl.trust","smtp.mail.ru");
-        // props.put("mail.smtp.timeout", "1000");
-        // props.put("mail.smtp.connectiontimeout", "1000");
+        props.put("mail.smtp.timeout", "1000");
+        props.put("mail.smtp.connectiontimeout", "1000");
         return mailSender;
     }
     @Bean

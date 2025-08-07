@@ -3,6 +3,7 @@ package com.example.serverchillrate.secutiry.service;
 import com.example.serverchillrate.dto.AuthResponse;
 import com.example.serverchillrate.dto.UserDto;
 import com.example.serverchillrate.secutiry.Role;
+import jakarta.mail.MessagingException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.UUID;
@@ -15,7 +16,7 @@ public interface AuthService {
     Role назначается в зависимости от endpoint
     выбрасывает ошибку если пользователь уже есть в бд
      */
-     AuthResponse register(UserDto request, Role role)throws UsernameNotFoundException;
+     AuthResponse register(UserDto request, Role role) throws UsernameNotFoundException, MessagingException;
      /*
      аналогичные требования для request
      выбрасывает ошибку если пользователя нет в бд с сообщение об этом

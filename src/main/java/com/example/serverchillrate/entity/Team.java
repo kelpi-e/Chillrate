@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
 import org.springframework.context.annotation.Lazy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,6 +31,9 @@ public class Team {
     List<UserApp> clients;
 
     public List<UUID> clientsToListId(){
+        if(clients==null){
+            return new ArrayList<>();
+        }
         return clients.stream().map(UserApp::getId).collect(Collectors.toList());
     }
 }
