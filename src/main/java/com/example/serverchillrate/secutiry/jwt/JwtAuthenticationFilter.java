@@ -1,7 +1,6 @@
 package com.example.serverchillrate.secutiry.jwt;
 
-import com.example.serverchillrate.entity.UserApp;
-import com.example.serverchillrate.secutiry.service.UdpServiceSecure;
+import com.example.serverchillrate.models.UserTemp;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,11 +12,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.UUID;
+
 /*
 Фильтр jwt регистрирующий пользователя при наличии и актуальности токена.
 Токен передаётся в header с параметрами
@@ -29,7 +32,8 @@ value=Client <token>
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final UdpServiceSecure udpServiceSecure;
+
+    private final HashMap<UUID, UserTemp> tempUsers;
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -44,23 +48,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try{
         final String jwt=authHeader.substring(7);
 
-        var userEmail= jwtService.extractUsername(jwt);
-        if(userEmail!=null && SecurityContextHolder.getContext().getAuthentication()==null){
-            UserDetails userDetails =this.userDetailsService.loadUserByUsername(userEmail);
-            if(jwtService.isTokenValid(jwt,userDetails)){
+
+        if(SecurityContextHolder.getContext().getAuthentication()==null){
+            //  UserDetails userDetails =this.userDetailsService.loadUserByUsername(userEmail);
+            if(jwtService.isTokenValid(jwt)){
+                var authUser=jwtService.getAuthUser(jwt);
+                if(!authUser.isConfirmMail()) {
+                    UserDetails checkUser = userDetailsService.loadUserByUsername(authUser.getUuid().toString());
+                    if (checkUser == null) {
+                        throw new UsernameNotFoundException("user not found");
+                    }
+                }
                 UsernamePasswordAuthenticationToken authenticationToken=new UsernamePasswordAuthenticationToken(
-                        userDetails,
+                        authUser,
                         null,
-                        userDetails.getAuthorities());
+                        authUser.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                udpServiceSecure.addClientData((UserApp) userDetails,jwt);
             }
         }
         }
         catch (Exception exception){
             logger.error(exception.getMessage());
-
         }
         filterChain.doFilter(request,response);
     }

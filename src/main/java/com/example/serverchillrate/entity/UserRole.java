@@ -7,16 +7,20 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Data
 public class UserRole {
 
     @Id
-    Role id;
-    @Enumerated(value = EnumType.STRING)
-    Role name;
+    Integer id;
+    String name;
+    public static UserRole createByEnumRole(Role role){
+        return UserRole.builder().id(role.ordinal()).name(role.name()).build();
+    }
 }

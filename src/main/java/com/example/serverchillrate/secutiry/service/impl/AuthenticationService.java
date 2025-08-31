@@ -4,23 +4,27 @@ package com.example.serverchillrate.secutiry.service.impl;
 import com.example.serverchillrate.dto.AuthResponse;
 import com.example.serverchillrate.dto.UserDto;
 import com.example.serverchillrate.dto.UserMapper;
+import com.example.serverchillrate.entity.InfluxPointApp;
+import com.example.serverchillrate.entity.UserRole;
+import com.example.serverchillrate.entity.UserSecurityDetails;
 import com.example.serverchillrate.models.ServerData;
 import com.example.serverchillrate.entity.UserApp;
 import com.example.serverchillrate.models.UserTemp;
+import com.example.serverchillrate.repository.UserSecurityDetailsRepository;
 import com.example.serverchillrate.secutiry.jwt.JwtService;
 import com.example.serverchillrate.secutiry.Role;
 import com.example.serverchillrate.repository.UserRepository;
 import com.example.serverchillrate.secutiry.service.AuthService;
-import com.example.serverchillrate.secutiry.service.UdpServiceSecure;
 import com.example.serverchillrate.services.EmailService;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /*
@@ -37,40 +41,52 @@ public class AuthenticationService implements AuthService {
     private final EmailService emailService;
     private final HashMap<UUID, UserTemp> tempUsers;
     private final ServerData serverData;
-    private final UdpServiceSecure udpServiceSecure;
     private final HashMap<UUID, HashSet<UserTemp>> adminUsersTemp;
+    private final HashMap<UUID,List<InfluxPointApp>> userToTempData;
+    private final UserSecurityDetailsRepository userSecurityDetailsRepository;
     /*
     регистрация нового пользователя
     добавляет нового пользователя с правами доступа USER
     request-запрос на добавления пользователя(Нужно сделать класс UserDto)
     результат:string (нужно сделать класс AuthenticateResponse)
     */
-    public AuthResponse register(UserDto request,Role role) throws UsernameNotFoundException {
+    public AuthResponse register(UserDto request,Role role,String device) throws UsernameNotFoundException {
             if (repository.findByEmail(request.getEmail()).isEmpty()) {
                 var user = UserApp.builder()
                         .id(UUID.randomUUID())
                         .email(request.getEmail())
                         .name(request.getName())
                         .password(passwordEncoder.encode(request.getPassword()))
-                        .role(role)
+                        .role(UserRole.createByEnumRole(role))
+                        .adminToken(role.equals(Role.ADMIN)?UUID.randomUUID():null)
                         .build();
+
+                UserSecurityDetails securityDetails=UserSecurityDetails.builder()
+                        .secret(UUID.randomUUID())
+                        .device(device)
+                        .userApp(user)
+                        .authorizationTime(LocalDateTime.now())
+                        .build();
+                var refreshToken=jwtService.generateRefreshToken(user,false,securityDetails);
+                user.setSecurityDetails(List.of(securityDetails));
+                var accessToken = jwtService.generateToken(user);
 
                 emailService.SendSimpleMessage(request.getEmail(), "Register for chillrate",
                         "http://" + serverData.getExternalHost() + ":" + serverData.getExternalPort() + "/api/v1/auth/confirmMail/" + user.getId().toString());
                 tempUsers.put(user.getId(), new UserTemp(user, new Date()));
-                var token = jwtService.generateToken(user);
-                udpServiceSecure.addJwtToClient(token, user);
-                return AuthResponse.builder().token(token).user(UserMapper.INSTANCE.toDto(user)).build();
+
+
+                return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).user(UserMapper.INSTANCE.toDto(user,true)).build();
             }
 
         throw  new UsernameNotFoundException("User already have");
     }
     /*
-    авторизация пользователя
+    авторизация пользотеля
     request-запрос на авторизацию(Нужно сделать класс UserDto)
     результат:string (нужно сделать класс AuthenticateResponse)
     */
-    public AuthResponse authenticate(UserDto request)throws UsernameNotFoundException{
+    public AuthResponse authenticate(UserDto request,String device)throws UsernameNotFoundException{
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow(()->new UsernameNotFoundException("not found user"));
         if(!passwordEncoder.matches(request.getPassword(),user.getPassword())){
@@ -78,17 +94,24 @@ public class AuthenticationService implements AuthService {
         }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
+                        user.getId().toString(),
                         request.getPassword()
                 )
         );
-        var jwtToken = jwtService.generateToken(user);
-        udpServiceSecure.addClientData(user,jwtToken);
-        udpServiceSecure.addJwtToClient(jwtToken,user);
-        if(user.getRole()==Role.ADMIN &&!adminUsersTemp.containsKey(user.getId())){
+        var updateUserSecurityDetails=UserSecurityDetails.builder().userApp(user).authorizationTime(LocalDateTime.now()).device(device).build();
+        var OldSession=userSecurityDetailsRepository.findByUserAppAndDevice(user,device);
+        OldSession.ifPresent(userSecurityDetails -> updateUserSecurityDetails.setId(userSecurityDetails.getId()));
+        updateUserSecurityDetails.setSecret(UUID.randomUUID());
+        userSecurityDetailsRepository.save(updateUserSecurityDetails);
+        var refreshToken= jwtService.generateRefreshToken(user,true,updateUserSecurityDetails);
+        var accessToken = jwtService.generateToken(user,true);
+        if(user.getRole().getId()==Role.ADMIN.ordinal() &&!adminUsersTemp.containsKey(user.getId())){
             adminUsersTemp.put(user.getId(),new HashSet<>());
         }
-        return AuthResponse.builder().token(jwtToken).user(UserMapper.INSTANCE.toDto(user)).build();
+        if(!userToTempData.containsKey(user.getId())){
+            userToTempData.put(user.getId(),new ArrayList<>());
+        }
+        return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).user(UserMapper.INSTANCE.toDto(user)).build();
     }
     /*
     функция подтверждения почты
@@ -99,12 +122,13 @@ public class AuthenticationService implements AuthService {
        UserTemp userTemp=tempUsers.get(id);
        if(userTemp!=null){
            repository.save(userTemp.getUser());
-           udpServiceSecure.addClientData(userTemp.getUser(),null);
            tempUsers.remove(id);
-           if(userTemp.getUser().getRole()==Role.ADMIN){
+           if(userTemp.getUser().getRole().getId()==Role.ADMIN.ordinal()){
                adminUsersTemp.put(userTemp.getUser().getId(),new HashSet<>());
            }
+           userToTempData.put(id,new ArrayList<>());
            return;
+
        }
         throw new UsernameNotFoundException("user not found");
 

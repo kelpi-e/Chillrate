@@ -1,6 +1,6 @@
 package com.example.serverchillrate.config;
 
-import com.example.serverchillrate.dto.ErrorResponseApp;
+import com.example.serverchillrate.dto.ResponseExceptionApp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,17 +12,24 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.NoSuchElementException;
+
 @RestControllerAdvice
 public class ExceptionApiHandler {
-    Logger logger= LoggerFactory.getLogger(UDPConfig.class);
+    Logger logger= LoggerFactory.getLogger(ExceptionApiHandler.class);
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorResponseApp> usernameNotFoundException(UsernameNotFoundException exception){
+    public ResponseEntity<ResponseExceptionApp> usernameNotFoundException(UsernameNotFoundException exception){
         //logger.error(exception.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponseApp.builder().message(exception.getMessage()).build());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseExceptionApp.builder().message(exception.getMessage()).build());
     }
     @ExceptionHandler(MailException.class)
-    public ResponseEntity<ErrorResponseApp> mailException(MailException mailException){
+    public ResponseEntity<ResponseExceptionApp> mailException(MailException mailException){
         logger.error(mailException.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponseApp.builder().message(mailException.getMessage()).build());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseExceptionApp.builder().message(mailException.getMessage()).build());
+    }
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ResponseExceptionApp> noSuchFieldError(NoSuchElementException exception){
+        logger.error(exception.getMessage());
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseExceptionApp.builder().message(exception.getMessage()).build());
     }
 }

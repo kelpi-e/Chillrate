@@ -34,8 +34,10 @@ public class SecurityConfig{
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(customer->{
+                            customer.requestMatchers("/v3/**").permitAll();
                             customer.requestMatchers("/swagger-ui/**").permitAll();
                             customer.requestMatchers("/api/v1/auth/**").permitAll();
+                            customer.requestMatchers("/api/v1/token").permitAll();
                             customer.requestMatchers("/tests/**").permitAll();
                             customer.requestMatchers("/api/v1/team/**").hasAuthority(Role.ADMIN.name());
                             customer.requestMatchers("/api/v1/admin/**").hasAuthority(Role.ADMIN.name());

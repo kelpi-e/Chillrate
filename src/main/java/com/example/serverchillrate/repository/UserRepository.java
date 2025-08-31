@@ -14,4 +14,5 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<UserApp, UUID> {
     //поиск пользователей по почте
     Optional<UserApp> findByEmail (String email);
+    Optional<UserApp> findByAdminToken(UUID adminToken);
 }

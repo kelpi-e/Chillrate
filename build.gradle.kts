@@ -25,9 +25,8 @@ repositories {
 
 dependencies {
 
-    // https:/
-    // /mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations
-    implementation("io.swagger.core.v3:swagger-annotations:2.0.2")
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
     // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
     implementation("org.springframework.integration:spring-integration-ip:6.0.0")
@@ -39,6 +38,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    // https://mvnrepository.com/artifact/com.influxdb/influxdb-client-java
+    implementation("com.influxdb:influxdb-client-java:4.0.0")
+    // https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api
+    implementation("jakarta.validation:jakarta.validation-api:3.1.1")
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.projectlombok:lombok")

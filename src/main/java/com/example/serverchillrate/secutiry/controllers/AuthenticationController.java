@@ -35,16 +35,19 @@ public class AuthenticationController {
     endpoint для регистрации
     */
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody UserDto user) throws MessagingException {
-        return ResponseEntity.ok( service.register(user, Role.USER));
+    public ResponseEntity<AuthResponse> register(@RequestBody UserDto user,
+                                                 @RequestHeader("User-Agent") String device) throws MessagingException {
+        return ResponseEntity.ok( service.register(user, Role.USER,device));
     }
     /*
     endpoint для авторизации
     */
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthResponse> authenticate(@RequestBody UserDto user) {
-        return ResponseEntity.ok(service.authenticate(user));
+    public ResponseEntity<AuthResponse> authenticate(@RequestBody UserDto user,
+                                                     @RequestHeader("User-Agent") String device) {
+        logger.info(device);
+        return ResponseEntity.ok(service.authenticate(user,device));
     }
     @GetMapping("/confirmMail/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -53,8 +56,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/regAdmin")
-    public ResponseEntity<AuthResponse> regAdmin(@RequestBody UserDto user) throws MessagingException {
-        return ResponseEntity.ok( service.register(user, Role.ADMIN));
+    public ResponseEntity<AuthResponse> regAdmin(@RequestBody UserDto user,
+                                                 @RequestHeader("User-Agent") String device) throws MessagingException {
+        return ResponseEntity.ok( service.register(user, Role.ADMIN,device));
 
     }
 }

@@ -1,10 +1,9 @@
 package com.example.serverchillrate.config;
 
+import com.example.serverchillrate.entity.InfluxPointApp;
 import com.example.serverchillrate.entity.UserRole;
-import com.example.serverchillrate.models.PairUserAndData;
 import com.example.serverchillrate.models.ServerData;
 import com.example.serverchillrate.models.UserTemp;
-import com.example.serverchillrate.repository.UserDataRepository;
 import com.example.serverchillrate.repository.UserRepository;
 import com.example.serverchillrate.repository.UserRoleRepository;
 import com.example.serverchillrate.secutiry.Role;
@@ -32,7 +31,7 @@ public class ApplicationConfig {
     private final UserRoleRepository userRoleRepository;
     @Bean
     public UserDetailsService userDetailsService(){
-        return username -> repository.findByEmail(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
+        return username -> repository.findById(UUID.fromString(username)).orElseThrow(()->new UsernameNotFoundException("user not found"));
     }
     @Bean
     public  AuthenticationProvider authenticationProvider(){
@@ -65,24 +64,19 @@ public class ApplicationConfig {
     /// @brief bean for mapping user data by jwt
     /// @details key-jwt value - list userData
     @Bean
-    public HashMap<UUID, PairUserAndData> uuidToTempData(){
+    public HashMap<UUID, List<InfluxPointApp>> uuidToTempData(){
         return new HashMap<>();
     }
     /// @brief bean for mapping jwt to uuid
     /// @details key-jwt value-UUID
-    @Bean
-    public HashMap<String,UUID> jwtTOUUid(){return  new HashMap<>();}
-    ///@brief bean to temp client
-    ///@details key-id admin value- set client ID
     @Bean
     public HashMap<UUID,HashSet<UserTemp>> AdminToTempClients(){
         return new HashMap<>();
     }
     @Bean
     public List<UserRole> getUserRoles(){
-        userRoleRepository.deleteAll();
         for(var e : Role.values()){
-            userRoleRepository.save(UserRole.builder().name(e).id(e).build());
+            userRoleRepository.save(UserRole.createByEnumRole(e));
         }
         return userRoleRepository.findAll();
     }

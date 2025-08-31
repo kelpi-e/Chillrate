@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -19,14 +20,14 @@ public class CRUDTeamImpl implements CRUDTeam {
     private final TeamRepository repository;
     private final UserRepository userRepository;
     @Override
-    public Team create(TeamDto dto, String emailAdmin) {
-        var admin=userRepository.findByEmail(emailAdmin).orElseThrow();
+    public Team create(TeamDto dto, UUID adminId) {
+        var admin=userRepository.findById(adminId).orElseThrow();
         return repository.save(Team.builder().name(dto.getName()).admin(admin).clients(new ArrayList<>()).build());
     }
 
     @Override
-    public Team read(Long id,String emailAdmin) {
-        var admin=userRepository.findByEmail(emailAdmin).orElseThrow();
+    public Team read(Long id,UUID adminId) {
+        var admin=userRepository.findById(adminId).orElseThrow();
         var team=repository.findById(id).orElseThrow();
         if(team.getAdmin()!=admin){
             throw new UsernameNotFoundException("it not admin team");
@@ -35,8 +36,8 @@ public class CRUDTeamImpl implements CRUDTeam {
     }
 
     @Override
-    public Team update(TeamDto dto, String emailAdmin) {
-        var admin=userRepository.findByEmail(emailAdmin).orElseThrow();
+    public Team update(TeamDto dto, UUID adminId) {
+        var admin=userRepository.findById(adminId).orElseThrow();
         var team=repository.findById(dto.getId()).orElseThrow();
         if(team.getAdmin()!=admin){
             throw new UsernameNotFoundException("it not admin team");
@@ -51,14 +52,14 @@ public class CRUDTeamImpl implements CRUDTeam {
     }
 
     @Override
-    public List<Team> getListTeam(String emailAdmin) {
-        var admin=userRepository.findByEmail(emailAdmin).orElseThrow();
+    public List<Team> getListTeam(UUID adminId) {
+        var admin=userRepository.findById(adminId).orElseThrow();
         return repository.findAllByAdmin(admin);
     }
 
     @Override
-    public void delete(Long id, String emailAdmin) {
-        var admin=userRepository.findByEmail(emailAdmin).orElseThrow();
+    public void delete(Long id,UUID adminId) {
+        var admin=userRepository.findById(adminId).orElseThrow();
         var team=repository.findById(id).orElseThrow();
 
         if(team.getAdmin()!=admin){
