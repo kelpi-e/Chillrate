@@ -22,5 +22,6 @@ public class ClearTempUserData {
     @Scheduled(cron = "0 0/15 * * * ?")
     public void clearUserDataTemp(){
         uuidTOUserAndData.forEach((key, value) -> value.removeIf(el -> el.getTime().isBefore(Instant.now().plus(15, ChronoUnit.MINUTES))));
+        uuidTOUserAndData.entrySet().removeIf(c->c.getValue().isEmpty());
     }
 }

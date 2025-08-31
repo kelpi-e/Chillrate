@@ -13,8 +13,10 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 public class RequestInfluxQueryOptions {
+    @Builder.Default
     @Pattern(regexp = "^-\\d*(w|d|h|m|s)$")
     String start="-15m";
+    @Builder.Default
     @Pattern(regexp = "^\\d*(w|d|h|m|s)$",message = "Invalid set aggregate value set")
     String aggregate=null;
 }

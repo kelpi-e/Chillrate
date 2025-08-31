@@ -41,8 +41,6 @@ public class AuthenticationService implements AuthService {
     private final EmailService emailService;
     private final HashMap<UUID, UserTemp> tempUsers;
     private final ServerData serverData;
-    private final HashMap<UUID, HashSet<UserTemp>> adminUsersTemp;
-    private final HashMap<UUID,List<InfluxPointApp>> userToTempData;
     private final UserSecurityDetailsRepository userSecurityDetailsRepository;
     /*
     регистрация нового пользователя
@@ -105,12 +103,6 @@ public class AuthenticationService implements AuthService {
         userSecurityDetailsRepository.save(updateUserSecurityDetails);
         var refreshToken= jwtService.generateRefreshToken(user,true,updateUserSecurityDetails);
         var accessToken = jwtService.generateToken(user,true);
-        if(user.getRole().getId()==Role.ADMIN.ordinal() &&!adminUsersTemp.containsKey(user.getId())){
-            adminUsersTemp.put(user.getId(),new HashSet<>());
-        }
-        if(!userToTempData.containsKey(user.getId())){
-            userToTempData.put(user.getId(),new ArrayList<>());
-        }
         return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).user(UserMapper.INSTANCE.toDto(user)).build();
     }
     /*
@@ -123,10 +115,6 @@ public class AuthenticationService implements AuthService {
        if(userTemp!=null){
            repository.save(userTemp.getUser());
            tempUsers.remove(id);
-           if(userTemp.getUser().getRole().getId()==Role.ADMIN.ordinal()){
-               adminUsersTemp.put(userTemp.getUser().getId(),new HashSet<>());
-           }
-           userToTempData.put(id,new ArrayList<>());
            return;
 
        }

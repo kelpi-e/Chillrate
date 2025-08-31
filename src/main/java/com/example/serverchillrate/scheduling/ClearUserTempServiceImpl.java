@@ -30,5 +30,6 @@ public class ClearUserTempServiceImpl  {
         Date dateNow=new Date();
        adminToTempUsers.forEach((key, value) -> value.removeIf(el ->
                TimeUnit.MILLISECONDS.toHours(dateNow.getTime() - el.getDate().getTime()) >= 1));
+       adminToTempUsers.entrySet().removeIf(c->c.getValue().isEmpty());
     }
 }
