@@ -4,20 +4,18 @@ package com.example.serverchillrate.secutiry.service.impl;
 import com.example.serverchillrate.dto.AuthResponse;
 import com.example.serverchillrate.dto.UserDto;
 import com.example.serverchillrate.dto.UserMapper;
-import com.example.serverchillrate.entity.InfluxPointApp;
 import com.example.serverchillrate.entity.UserRole;
-import com.example.serverchillrate.entity.UserSecurityDetails;
+import com.example.serverchillrate.entity.AuthorizationDetails;
 import com.example.serverchillrate.models.ServerData;
 import com.example.serverchillrate.entity.UserApp;
 import com.example.serverchillrate.models.UserTemp;
-import com.example.serverchillrate.repository.UserSecurityDetailsRepository;
+import com.example.serverchillrate.repository.AuthorizationDetailsrepository;
 import com.example.serverchillrate.secutiry.jwt.JwtService;
 import com.example.serverchillrate.secutiry.Role;
 import com.example.serverchillrate.repository.UserRepository;
 import com.example.serverchillrate.secutiry.service.AuthService;
 import com.example.serverchillrate.services.EmailService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,7 +39,7 @@ public class AuthenticationService implements AuthService {
     private final EmailService emailService;
     private final HashMap<UUID, UserTemp> tempUsers;
     private final ServerData serverData;
-    private final UserSecurityDetailsRepository userSecurityDetailsRepository;
+    private final AuthorizationDetailsrepository authorizationDetailsrepository;
     /*
     регистрация нового пользователя
     добавляет нового пользователя с правами доступа USER
@@ -59,14 +57,14 @@ public class AuthenticationService implements AuthService {
                         .adminToken(role.equals(Role.ADMIN)?UUID.randomUUID():null)
                         .build();
 
-                UserSecurityDetails securityDetails=UserSecurityDetails.builder()
+                AuthorizationDetails authorizationDetails= AuthorizationDetails.builder()
                         .secret(UUID.randomUUID())
                         .device(device)
                         .userApp(user)
                         .authorizationTime(LocalDateTime.now())
                         .build();
-                var refreshToken=jwtService.generateRefreshToken(user,false,securityDetails);
-                user.setSecurityDetails(List.of(securityDetails));
+                var refreshToken=jwtService.generateRefreshToken(user,false,authorizationDetails);
+                user.setSecurityDetails(List.of(authorizationDetails));
                 var accessToken = jwtService.generateToken(user);
 
                 emailService.SendSimpleMessage(request.getEmail(), "Register for chillrate",
@@ -84,7 +82,7 @@ public class AuthenticationService implements AuthService {
     request-запрос на авторизацию(Нужно сделать класс UserDto)
     результат:string (нужно сделать класс AuthenticateResponse)
     */
-    public AuthResponse authenticate(UserDto request,String device)throws UsernameNotFoundException{
+    public AuthResponse authorization(UserDto request,String device)throws UsernameNotFoundException{
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow(()->new UsernameNotFoundException("not found user"));
         if(!passwordEncoder.matches(request.getPassword(),user.getPassword())){
@@ -96,12 +94,12 @@ public class AuthenticationService implements AuthService {
                         request.getPassword()
                 )
         );
-        var updateUserSecurityDetails=UserSecurityDetails.builder().userApp(user).authorizationTime(LocalDateTime.now()).device(device).build();
-        var OldSession=userSecurityDetailsRepository.findByUserAppAndDevice(user,device);
-        OldSession.ifPresent(userSecurityDetails -> updateUserSecurityDetails.setId(userSecurityDetails.getId()));
-        updateUserSecurityDetails.setSecret(UUID.randomUUID());
-        userSecurityDetailsRepository.save(updateUserSecurityDetails);
-        var refreshToken= jwtService.generateRefreshToken(user,true,updateUserSecurityDetails);
+        var authorizationDetails= AuthorizationDetails.builder().userApp(user).authorizationTime(LocalDateTime.now()).device(device).build();
+        var OldSession= authorizationDetailsrepository.findByUserAppAndDevice(user,device);
+        OldSession.ifPresent(authorizationDetails1 -> authorizationDetails1.setId(authorizationDetails.getId()));
+        authorizationDetails.setSecret(UUID.randomUUID());
+        authorizationDetailsrepository.save(authorizationDetails);
+        var refreshToken= jwtService.generateRefreshToken(user,true,authorizationDetails);
         var accessToken = jwtService.generateToken(user,true);
         return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).user(UserMapper.INSTANCE.toDto(user)).build();
     }

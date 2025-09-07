@@ -22,7 +22,7 @@ public interface AuthService {
      выбрасывает ошибку если пользователя нет в бд с сообщение об этом
      выбрасывает ошибку если пароли не совпадают  с сообщением об этом
       */
-    AuthResponse authenticate(UserDto request,String device)throws UsernameNotFoundException;
+    AuthResponse authorization(UserDto request,String device)throws UsernameNotFoundException;
     /*
     подтверждение почты
     в случае если id не найдет выбрасывает ошибку

@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserSecurityDetails {
+public class AuthorizationDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;

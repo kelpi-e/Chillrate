@@ -1,6 +1,7 @@
 package com.example.serverchillrate.config;
 
 import com.example.serverchillrate.dto.ResponseExceptionApp;
+import io.jsonwebtoken.JwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -31,5 +32,9 @@ public class ExceptionApiHandler {
     public ResponseEntity<ResponseExceptionApp> noSuchFieldError(NoSuchElementException exception){
         logger.error(exception.getMessage());
         return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseExceptionApp.builder().message(exception.getMessage()).build());
+    }
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ResponseExceptionApp> jwtException(JwtException exception){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseExceptionApp.builder().message(exception.getMessage()).build());
     }
 }

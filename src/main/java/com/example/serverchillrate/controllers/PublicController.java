@@ -2,6 +2,8 @@ package com.example.serverchillrate.controllers;
 
 import com.example.serverchillrate.ServerChillRateApplication;
 import com.example.serverchillrate.services.EmailService;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -11,7 +13,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.*;
-
+@Tag(name = "тестовый контроллер")
 @RestController
 @RequiredArgsConstructor
 public class PublicController {

@@ -1,6 +1,7 @@
 package com.example.serverchillrate.secutiry.jwt;
 
 import com.example.serverchillrate.models.UserTemp;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String authHeader=request.getHeader("Authorization");
 
-        if(authHeader==null ||!authHeader.startsWith("Client ")){
+
+        if(authHeader==null ||!authHeader.startsWith("Client ")||!authHeader.startsWith("Bearer ")){
             filterChain.doFilter(request,response);
             return;
         }
@@ -56,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if(!authUser.isConfirmMail()) {
                     UserDetails checkUser = userDetailsService.loadUserByUsername(authUser.getUuid().toString());
                     if (checkUser == null) {
-                        throw new UsernameNotFoundException("user not found");
+                        throw new JwtException("user not found");
                     }
                 }
                 UsernamePasswordAuthenticationToken authenticationToken=new UsernamePasswordAuthenticationToken(
@@ -69,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         }
         catch (Exception exception){
-            logger.error(exception.getMessage());
+            throw new JwtException(exception.getMessage());
         }
         filterChain.doFilter(request,response);
     }

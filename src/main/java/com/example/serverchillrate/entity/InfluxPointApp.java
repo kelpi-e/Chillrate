@@ -26,7 +26,7 @@ public class InfluxPointApp {
     @Column(name = "user")
     private String uuid;
     @Column(measurement = true)
-    @Pattern(regexp = "^[a-z]{1,10}\\d*$",message = "Неверное имя датчика")
+    @Pattern(regexp = "^[a-zA-z]\\d*$",message = "Неверное имя датчика")
     private String sensorType;
     public LocalDateTime toLocalDateTime(){
         return LocalDateTime.ofInstant(time, ZoneId.systemDefault());

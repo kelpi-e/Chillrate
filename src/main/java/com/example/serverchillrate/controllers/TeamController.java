@@ -7,6 +7,9 @@ import com.example.serverchillrate.entity.InfluxPointApp;
 import com.example.serverchillrate.models.AuthUser;
 import com.example.serverchillrate.services.CRUDTeam;
 import com.example.serverchillrate.services.TeamClientService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,53 +22,62 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/team")
+@Tag(name = "Контроллер управления командами",description = "Контроллер управления командами, включающий в себя crud команды и даобавление удаление пользователей в команде и получение данных пользователей в команде")
 @RequiredArgsConstructor
 public class TeamController {
     private final TeamClientService service;
     private final CRUDTeam crudTeam;
+    @Operation(summary = "Добавление пользователя в команду",description = "добавление пользователяБ ожидающего распределения, в команду")
     @PostMapping("/{teamId}/{userID}")
     @ResponseStatus(HttpStatus.OK)
-    public TeamDto confirmToTeam(@PathVariable Long teamId,
-                                 @PathVariable UUID userID,
-                                 @AuthenticationPrincipal AuthUser authUser){
+    public TeamDto confirmToTeam(@Parameter(required = true) @PathVariable Long teamId,
+                                 @Parameter(required = true) @PathVariable UUID userID,
+                                 @Parameter(description = "Данные получаемые из jwt") @AuthenticationPrincipal AuthUser authUser){
         return TeamMapper.INSTANCE.toDto( service.addUser(teamId,userID,authUser.getUuid()));
     }
+    @Operation(summary = "Удаление пользователей из команды")
     @DeleteMapping("/{teamId}/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public TeamDto deleteUserToTeam(@PathVariable Long teamId,
-                                    @PathVariable UUID userId,
-                                    @AuthenticationPrincipal AuthUser authUser){
+    public TeamDto deleteUserToTeam(@Parameter(required = true) @PathVariable Long teamId,
+                                    @Parameter(required = true) @PathVariable UUID userId,
+                                    @Parameter(description = "Данные получаемые из jwt") @AuthenticationPrincipal AuthUser authUser){
         return TeamMapper.INSTANCE.toDto( service.deleteUser(teamId,userId,authUser.getUuid()));
     }
+    @Operation(summary = "Создание команды")
     @PostMapping()
-    public ResponseEntity<TeamDto> createTeam(@RequestBody TeamDto dto,
-                                              @AuthenticationPrincipal AuthUser authUser){
+    public ResponseEntity<TeamDto> createTeam(@Parameter(required = true) @RequestBody TeamDto dto,
+                                              @Parameter(description = "Данные получаемые из jwt") @AuthenticationPrincipal AuthUser authUser){
         return ResponseEntity.ok(TeamMapper.INSTANCE.toDto(crudTeam.create(dto,authUser.getUuid())));
     }
+    @Operation(summary = "Обновление имени команды")
     @PutMapping()
-    public ResponseEntity<TeamDto> updateTeam(@RequestBody TeamDto dto,
-                                              @AuthenticationPrincipal AuthUser authUser){
+    public ResponseEntity<TeamDto> updateTeam(@Parameter(required = true) @RequestBody TeamDto dto,
+                                              @Parameter(description = "Данные получаемые из jwt") @AuthenticationPrincipal AuthUser authUser){
         return ResponseEntity.ok(TeamMapper.INSTANCE.toDto(crudTeam.update(dto,authUser.getUuid())));
     }
+    @Operation(summary = "Получить список команд")
     @GetMapping()
-    public ResponseEntity<List<TeamDto>> getTeams(@AuthenticationPrincipal AuthUser authUser){
+    public ResponseEntity<List<TeamDto>> getTeams(@Parameter(description = "Данные получаемые из jwt") @AuthenticationPrincipal AuthUser authUser){
         return ResponseEntity.ok(TeamMapper.INSTANCE.toListDto(crudTeam.getListTeam(authUser.getUuid())));
     }
+    @Operation(summary = "Получить данные команды")
     @GetMapping("/{id}")
-    public ResponseEntity<TeamDto> getTeam(@PathVariable Long id,
-                                           @AuthenticationPrincipal AuthUser authUser){
+    public ResponseEntity<TeamDto> getTeam(@Parameter(required = true) @PathVariable Long id,
+                                           @Parameter(description = "Данные получаемые из jwt") @AuthenticationPrincipal AuthUser authUser){
         return ResponseEntity.ok(TeamMapper.INSTANCE.toDto(crudTeam.read(id,authUser.getUuid())));
     }
+    @Operation(summary = "Удаленние команды")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTeam(@PathVariable Long id,@AuthenticationPrincipal AuthUser authUser){
+    public void deleteTeam(@Parameter(required = true) @PathVariable Long id,@Parameter(description = "Данные получаемые из jwt") @AuthenticationPrincipal AuthUser authUser){
         crudTeam.delete(id,authUser.getUuid());
     }
+    @Operation(summary = "Получить данные члена команды")
     @GetMapping("/{teamId}/{userId}/data/{typeSensor}")
-    public ResponseEntity<List<InfluxPointApp>> getUserData(@PathVariable Long teamId,
-                                                            @PathVariable UUID userId,
-                                                            @AuthenticationPrincipal AuthUser authUser,
-                                                            @PathVariable String typeSensor,
+    public ResponseEntity<List<InfluxPointApp>> getUserData(@Parameter(required = true) @PathVariable Long teamId,
+                                                            @Parameter(required = true) @PathVariable UUID userId,
+                                                            @Parameter(description = "Данные получаемые из jwt") @AuthenticationPrincipal AuthUser authUser,
+                                                            @Parameter(required = true) @PathVariable String typeSensor,
                                                             @RequestBody(required = false)RequestInfluxQueryOptions options){
         if(options==null){
             options=new RequestInfluxQueryOptions();

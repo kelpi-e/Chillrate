@@ -1,7 +1,7 @@
 package com.example.serverchillrate.secutiry.jwt;
 
 import com.example.serverchillrate.entity.UserApp;
-import com.example.serverchillrate.entity.UserSecurityDetails;
+import com.example.serverchillrate.entity.AuthorizationDetails;
 import com.example.serverchillrate.models.AuthUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -67,7 +67,7 @@ public class JwtService {
         return  generateToken(claims,authUser,expiration);
     }
     public String generateRefreshToken(UserApp userDetails,boolean confirmEmail,
-                                              UserSecurityDetails securityDetails){
+                                              AuthorizationDetails securityDetails){
         return generateToken(AuthUser.builder()
                 .uuid(userDetails.getId())
                 .authorities(userDetails.getAuthorities())
