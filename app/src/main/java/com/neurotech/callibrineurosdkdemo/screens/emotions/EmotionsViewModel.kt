@@ -1,6 +1,5 @@
 package com.neurotech.callibrineurosdkdemo.screens.emotions
 
-import android.util.Log
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
@@ -11,22 +10,20 @@ import com.neurotech.emstartifcats.ArtifactDetectSetting
 import com.neurotech.emstartifcats.MathLibSetting
 import com.neurotech.emstartifcats.MentalAndSpectralSetting
 import com.neurotech.emstartifcats.ShortArtifactDetectSetting
+import com.neurotech.callibrineurosdkdemo.storage.HistoryStorage
 
 class EmotionsViewModel : ViewModel() {
+
     //<editor-fold desc="Properties">
     private var emotionalMath: EmotionalMath
-
     var started = ObservableBoolean(false)
     private var calibrated = ObservableBoolean(false)
     var artifacted = ObservableBoolean(false)
-
     var calibrationProgress = ObservableField(0)
-
     var relaxationText = ObservableField("Relaxation: Waiting for calibration...")
     var attentionText = ObservableField("Attention: Waiting for calibration...")
     var relRelaxationText = ObservableField("Rel Relaxation: Waiting for calibration...")
     var relAttentionText = ObservableField("Rel Attention: Waiting for calibration...")
-
     var alphaText = ObservableField("Alpha: Waiting for calibration...")
     var betaText = ObservableField("Beta: Waiting for calibration...")
     var gammaText = ObservableField("Gamma: Waiting for calibration...")
@@ -34,12 +31,17 @@ class EmotionsViewModel : ViewModel() {
     var deltaText = ObservableField("Delta: Waiting for calibration...")
     //</editor-fold>
 
+    // последние спектральные значения, обновляются в lastSpectralData
+    private var lastAlpha = 0.0
+    private var lastBeta = 0.0
+    private var lastGamma = 0.0
+    private var lastTheta = 0.0
+    private var lastDelta = 0.0
+
     //<editor-fold desc="Init and Close">
     init {
         val samplingFrequencyHz = CallibriController.samplingFrequency?.toInt()
-
-        emotionalMath =
-            samplingFrequencyHz?.let { getEmotionalConfig(it) }?.let { EmotionalMath(it) }!!
+        emotionalMath = samplingFrequencyHz?.let { getEmotionalConfig(it) }?.let { EmotionalMath(it) }!!
     }
 
     fun close() {
@@ -57,55 +59,61 @@ class EmotionsViewModel : ViewModel() {
         } else {
             startSignal()
         }
-
         started.set(!started.get())
     }
     //</editor-fold>
 
     //<editor-fold desc="Signal">
     private fun startSignal() {
-        emotionalMath.isCalibrationSuccess = {
-            calibrated.set(it)
-        }
-
-        emotionalMath.isArtifacted = {
-            artifacted.set(it)
-        }
+        emotionalMath.isCalibrationSuccess = { calibrated.set(it) }
+        emotionalMath.isArtifacted = { artifacted.set(it) }
 
         emotionalMath.lastMindData = {
             relaxationText.set("Relaxation: " + String.format("%.2f", it.instRelaxation) + "%")
             attentionText.set("Attention: " + String.format("%.2f", it.instAttention) + "%")
             relRelaxationText.set("Rel Relaxation: " + String.format("%.2f", it.relRelaxation))
             relAttentionText.set("Rel Attention: " + String.format("%.2f", it.relAttention))
+
+            // Сохраняем запись в файл (используем последние спектральные значения)
+            try {
+                val entry = com.neurotech.callibrineurosdkdemo.storage.HistoryStorage.LoggedEntry(
+                    ts = System.currentTimeMillis(),
+                    instRelaxation = it.instRelaxation.toDouble()/*,
+                    instAttention = it.instAttention.toDouble(),
+                    relRelaxation = it.relRelaxation.toDouble(),
+                    relAttention = it.relAttention.toDouble(),
+                    alpha = lastAlpha,
+                    beta = lastBeta,
+                    gamma = lastGamma,
+                    theta = lastTheta,
+                    delta = lastDelta*/
+                )
+                HistoryStorage.saveEntry(entry)
+            } catch (_: Exception) { /* ignore saving errors */ }
         }
 
-        emotionalMath.calibrationProgress = {
-            calibrationProgress.set(it)
-        }
+        emotionalMath.calibrationProgress = { calibrationProgress.set(it) }
 
         emotionalMath.lastSpectralData = {
-            val alphaValue = String.format("%.2f", it.alpha) + "%"
-            val betaValue = String.format("%.2f", it.beta) + "%"
-            val gammaValue = String.format("%.2f", it.gamma) + "%"
-            val thetaValue = String.format("%.2f", it.theta) + "%"
-            val deltaValue = String.format("%.2f", it.delta) + "%"
-            //
-            alphaText.set("Alpha: $alphaValue")
-            betaText.set("Beta: $betaValue")
-            gammaText.set("Gamma: $gammaValue")
-            thetaText.set("Theta: $thetaValue")
-            deltaText.set("Delta: $deltaValue")
-            //
-            //Log.d("EmotionsViewModel", "Spectral Data - Alpha: $alphaValue, Beta: $betaValue, Gamma: $gammaValue, Theta: $thetaValue, Delta: $deltaValue")
+            alphaText.set("Alpha: " + String.format("%.2f", it.alpha) + "%")
+            betaText.set("Beta: " + String.format("%.2f", it.beta) + "%")
+            gammaText.set("Gamma: " + String.format("%.2f", it.gamma) + "%")
+            thetaText.set("Theta: " + String.format("%.2f", it.theta) + "%")
+            deltaText.set("Delta: " + String.format("%.2f", it.delta) + "%")
+
+            // обновляем локальные переменные, чтобы при следующей записи mind-данных спектр был доступен
+            lastAlpha = it.alpha
+            lastBeta = it.beta
+            lastGamma = it.gamma
+            lastTheta = it.theta
+            lastDelta = it.delta
         }
 
-        CallibriController.startSignal {
+        CallibriController.startSignal { samplesList ->
             val res = mutableListOf<Double>()
-
-            for (sample in it) {
+            for (sample in samplesList) {
                 res.addAll(sample.samples.toList())
             }
-
             emotionalMath.pushData(res.toDoubleArray())
         }
     }
@@ -116,42 +124,20 @@ class EmotionsViewModel : ViewModel() {
         val lastWinsToAvg = 3
         val poorSignalAvgSize = 5
         val poorSignalAvgTrigger = .8F
-
-        val mathLibSetting =
-            MathLibSetting(/* samplingRate = */        samplingFrequencyHz,/* processWinFreq = */
-                25,/* fftWindow = */
-                samplingFrequencyHz * 2, // needs to be doubled sampling frequency
-                /* nFirstSecSkipped = */
-                6,/* bipolarMode = */
-                false,/* channelsNumber = */
-                1,/* channelForAnalysis = */
-                0
-            )
-
-        val artifactDetectSetting =
-            ArtifactDetectSetting(
-                110,
-                70,
-                800_000,
-                (3*1e7).toInt(),
-                4,
-                false,
-                false,
-                true,
-                100
-            )
-
-        val shortArtifactDetectSetting =
-            ShortArtifactDetectSetting(/* amplArtDetectWinSize = */200,/* amplArtZerodArea = */
-                200,/* amplArtExtremumBorder = */
-                25
-            )
-
-        val mentalAndSpectralSetting =
-            MentalAndSpectralSetting(/* nSecForInstantEstimation = */2,/* nSecForAveraging = */
-                2
-            )
-
+        val mathLibSetting = MathLibSetting(
+            samplingFrequencyHz,
+            25,
+            samplingFrequencyHz * 2,
+            6,
+            false,
+            1,
+            0
+        )
+        val artifactDetectSetting = ArtifactDetectSetting(
+            110, 70, 800_000, (3*1e7).toInt(), 4, false, false, true, 100
+        )
+        val shortArtifactDetectSetting = ShortArtifactDetectSetting(200, 200, 25)
+        val mentalAndSpectralSetting = MentalAndSpectralSetting(2, 2)
         return EmotionalMathConfig(
             samplingFrequencyHz,
             lastWinsToAvg,

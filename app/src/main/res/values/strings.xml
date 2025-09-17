@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CallibriNeuroSDKDemo</string>
+    <string name="app_name">Chillrate</string>
 
     <string name="search">Search</string>
     <string name="menu_fragment_label">Menu</string>
@@ -44,5 +44,14 @@
     <string name="calibrate">Calibrate</string>
     <string name="artifacted">Artifacted</string>
     <string name="not_artifacted">Not Artifacted</string>
-
+    <string name="no_data_available">Нет доступных данных</string>
+    <string name="relaxation_label">Расслабление:</string>
+    <string name="attention_label">Внимание:</string>
+    <string name="alpha_label">Альфа:</string>
+    <string name="beta_label">Бета:</string>
+    <string name="gamma_label">Гамма:</string>
+    <string name="theta_label">Тета:</string>
+    <string name="delta_label">Дельта:</string>
+    <string name="navigation_drawer_open">Открыть меню</string>
+    <string name="navigation_drawer_close">Закрыть меню</string>
 </resources>

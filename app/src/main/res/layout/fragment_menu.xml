@@ -89,6 +89,27 @@
                     android:enabled="@{viewModel.hasDevice}"
                     android:text="@{viewModel.connected ? @string/disconnect : @string/connect}"
                     android:visibility="@{viewModel.connected ? View.VISIBLE : View.GONE}"/>
+                <Button
+                    android:id="@+id/button_login"
+                    android:layout_width="@dimen/button_width"
+                    android:layout_height="wrap_content"
+                    android:text="login"/>
+
+                <Button
+                    android:id="@+id/button_history"
+                    android:layout_width="148dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="History"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+                <Button
+                    android:id="@+id/button_scan_qr"
+                    android:layout_width="@dimen/button_width"
+                    android:layout_height="wrap_content"
+                    android:text="Scan qr code"
+                    android:visibility="@{viewModel.connected ? View.VISIBLE : View.GONE}" />
+
             </LinearLayout>
         </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>

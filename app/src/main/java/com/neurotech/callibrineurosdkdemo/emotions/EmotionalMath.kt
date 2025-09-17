@@ -139,7 +139,7 @@ class EmotionalMath(config: EmotionalMathConfig) {
 
                 lastCalibrationPercent = progress
             }
-//            Log.d(::EmotionalMath.name, "Calibration percents: $progress")
+            Log.d(::EmotionalMath.name, "Calibration percents: $progress")
         }
     }
 
