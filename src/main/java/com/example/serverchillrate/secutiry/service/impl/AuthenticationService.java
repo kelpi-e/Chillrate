@@ -15,6 +15,7 @@ import com.example.serverchillrate.secutiry.Role;
 import com.example.serverchillrate.repository.UserRepository;
 import com.example.serverchillrate.secutiry.service.AuthService;
 import com.example.serverchillrate.services.EmailService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -64,7 +65,7 @@ public class AuthenticationService implements AuthService {
                         .authorizationTime(LocalDateTime.now())
                         .build();
                 var refreshToken=jwtService.generateRefreshToken(user,false,authorizationDetails);
-                user.setSecurityDetails(List.of(authorizationDetails));
+                user.setAuthorizationDetails(List.of(authorizationDetails));
                 var accessToken = jwtService.generateToken(user);
 
                 emailService.SendSimpleMessage(request.getEmail(), "Register for chillrate",
@@ -94,11 +95,18 @@ public class AuthenticationService implements AuthService {
                         request.getPassword()
                 )
         );
-        var authorizationDetails= AuthorizationDetails.builder().userApp(user).authorizationTime(LocalDateTime.now()).device(device).build();
-        var OldSession= authorizationDetailsrepository.findByUserAppAndDevice(user,device);
-        OldSession.ifPresent(authorizationDetails1 -> authorizationDetails1.setId(authorizationDetails.getId()));
-        authorizationDetails.setSecret(UUID.randomUUID());
-        authorizationDetailsrepository.save(authorizationDetails);
+        AuthorizationDetails authorizationDetails;
+        var oldDetails=user.getAuthorizationDetails().stream().filter(c->c.getDevice().equals(device)).findAny();
+        if(oldDetails.isPresent()){
+            oldDetails.get().setAuthorizationTime(LocalDateTime.now());
+            oldDetails.get().setSecret(UUID.randomUUID());
+            authorizationDetails=oldDetails.get();
+        }
+        else{
+            authorizationDetails= AuthorizationDetails.builder().userApp(user).authorizationTime(LocalDateTime.now()).device(device).secret(UUID.randomUUID()).build();
+            user.getAuthorizationDetails().add(authorizationDetails);
+        }
+        repository.save(user);
         var refreshToken= jwtService.generateRefreshToken(user,true,authorizationDetails);
         var accessToken = jwtService.generateToken(user,true);
         return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).user(UserMapper.INSTANCE.toDto(user)).build();
@@ -118,6 +126,12 @@ public class AuthenticationService implements AuthService {
        }
         throw new UsernameNotFoundException("user not found");
 
+    }
+    @Override
+    public void logout(UUID id) {
+        var user=repository.findById(id).orElseThrow();
+        user.getAuthorizationDetails().clear();
+        repository.save(user);
     }
 
 }

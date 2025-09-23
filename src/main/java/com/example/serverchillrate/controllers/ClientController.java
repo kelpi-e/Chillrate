@@ -9,6 +9,7 @@ import com.example.serverchillrate.services.InfluxDBService;
 import com.example.serverchillrate.services.TeamClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/client")
+@SecurityRequirement(name = "JWT")
 public class ClientController {
     private final TeamClientService service;
     private final InfluxDBService influxDBService;
@@ -41,9 +43,14 @@ public class ClientController {
     @GetMapping("/data/{typeSensor}")
     public ResponseEntity<List<PointDto>> getData(@Parameter(required = true) @PathVariable String typeSensor,
                                                   @Parameter(description = "данные получаемые из jwt токена") @AuthenticationPrincipal AuthUser authUser,
-                                                  @RequestBody(required = false) RequestInfluxQueryOptions options){
-        if(options==null){
-            options=new RequestInfluxQueryOptions();
+                                                  @Parameter(description = "интервал времени,за который берём данные, в отрицательнои формате(пример -15m - за посследние 15 минут)") @RequestParam(required = false,name = "start") String start,
+                                                  @Parameter(description = "аггрегирование точек по среднему значению в промежуток премени(пример 5m - 5 минут)")@RequestParam(required = false) String aggregate){
+        RequestInfluxQueryOptions options=new RequestInfluxQueryOptions();
+        if(start!=null){
+            options.setStart(start);
+        }
+        if(aggregate!=null){
+            options.setAggregate(aggregate);
         }
         return ResponseEntity.ok(PointDtoMapper.INSTANCE.toListDto( influxDBService.getData(typeSensor,authUser.getUuid(),options)));
     }

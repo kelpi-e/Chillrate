@@ -16,9 +16,10 @@ import java.util.UUID;
 @Builder
 public class AuthorizationDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Integer id;
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name="user_id")
     UserApp userApp;
     UUID secret;
     String device;

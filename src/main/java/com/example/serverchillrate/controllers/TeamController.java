@@ -9,6 +9,7 @@ import com.example.serverchillrate.services.CRUDTeam;
 import com.example.serverchillrate.services.TeamClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-
+@SecurityRequirement(name = "JWT")
+@Tag(name="TeamController",description = "Контроллер управления командами, включающий в себя crud команды и даобавление удаление пользователей в команде и получение данных пользователей в команде")
 @RestController
 @RequestMapping("/api/v1/team")
-@Tag(name = "Контроллер управления командами",description = "Контроллер управления командами, включающий в себя crud команды и даобавление удаление пользователей в команде и получение данных пользователей в команде")
 @RequiredArgsConstructor
 public class TeamController {
     private final TeamClientService service;
@@ -78,9 +79,15 @@ public class TeamController {
                                                             @Parameter(required = true) @PathVariable UUID userId,
                                                             @Parameter(description = "Данные получаемые из jwt") @AuthenticationPrincipal AuthUser authUser,
                                                             @Parameter(required = true) @PathVariable String typeSensor,
-                                                            @RequestBody(required = false)RequestInfluxQueryOptions options){
-        if(options==null){
-            options=new RequestInfluxQueryOptions();
+                                                            @Parameter(description = "интервал времени,за который берём данные, в отрицательнои формате(пример -15m - за посследние 15 минут)") @RequestParam(required = false,name = "start") String start,
+                                                            @Parameter(description = "аггрегирование точек по среднему значению в промежуток премени(пример 5m - 5 минут)")@RequestParam(required = false) String aggregate){
+
+        RequestInfluxQueryOptions options=new RequestInfluxQueryOptions();
+        if(start!=null){
+            options.setStart(start);
+        }
+        if(aggregate!=null){
+            options.setAggregate(aggregate);
         }
         return ResponseEntity.ok(service.getUserData(teamId,userId,authUser.getUuid(),typeSensor,options));
     }

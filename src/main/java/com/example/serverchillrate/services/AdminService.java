@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface AdminService {
      String getUrl(UUID id);
      List<UserApp> getUsersWait(UUID idAdmin);
-
+     String updateUrl(UUID id);
 }

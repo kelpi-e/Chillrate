@@ -2,6 +2,7 @@ package com.example.serverchillrate.secutiry.controllers;
 
 import com.example.serverchillrate.dto.AuthResponse;
 import com.example.serverchillrate.dto.UserDto;
+import com.example.serverchillrate.models.AuthUser;
 import com.example.serverchillrate.secutiry.Role;
 import com.example.serverchillrate.secutiry.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -63,5 +65,11 @@ public class AuthorizationController {
                                                  @Parameter(required = true,description = "устройство с которого регистрируется пользователь") @RequestHeader("User-Agent") String device) throws MessagingException {
         return ResponseEntity.ok( service.register(user, Role.ADMIN,device));
 
+    }
+    @Operation(description = "выход из аккаунта")
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/logout")
+    public void logout(@AuthenticationPrincipal AuthUser authUser){
+        service.logout(authUser.getUuid());
     }
 }

@@ -34,8 +34,8 @@ public class UserApp implements UserDetails {
     private UUID adminToken;
     @ManyToOne(fetch = FetchType.EAGER)
     UserRole role;
-    @OneToMany(cascade = CascadeType.MERGE)
-    List<AuthorizationDetails> securityDetails;
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "userApp",orphanRemoval = true)
+    List<AuthorizationDetails> authorizationDetails;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name));

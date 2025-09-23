@@ -18,9 +18,7 @@ import java.util.stream.Collectors;
 public class AdminServiceImpl implements AdminService {
     private final ServerData serverData;
     private final UserRepository userRepository;
-    private final InfluxDBService influxDBService;
     private final HashMap<UUID, HashSet<UserTemp>> uuidAdminToWaitUsers;
-    private final TeamRepository teamRepository;
     @Override
     public String getUrl(UUID adminId) {
         var user=userRepository.findById(adminId).orElseThrow();
@@ -35,6 +33,14 @@ public class AdminServiceImpl implements AdminService {
             return new ArrayList<>();
         }
         return tempUsers.stream().map(UserTemp::getUser).collect(Collectors.toList());
+    }
+
+    @Override
+    public String updateUrl(UUID id) {
+        var user=userRepository.findById(id).orElseThrow();
+        user.setAdminToken(UUID.randomUUID());
+        userRepository.save(user);
+        return serverData.getExternalHost()+":"+serverData.getExternalPort()+"/api/v1/client/"+user.getAdminToken();
     }
 
 }

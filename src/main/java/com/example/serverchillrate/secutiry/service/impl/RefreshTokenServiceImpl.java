@@ -23,10 +23,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         if(jwtService.isTokenValid(refreshToken)) {
             var authUser = jwtService.getAuthUser(refreshToken);
             var user= userRepository.findById(authUser.getUuid()).orElseThrow();
-            var authorizationDetails= authorizationDetailsrepository.findByUserAppAndDevice(user, authUser.getDevice()).orElseThrow();
+            var authorizationDetails=user.getAuthorizationDetails().stream().filter(c->c.getDevice().equals(authUser.getDevice())).findAny().orElseThrow();
             if(authorizationDetails.getSecret().equals(authUser.getSecret())){
                 authorizationDetails.setSecret(UUID.randomUUID());
-                authorizationDetailsrepository.save(authorizationDetails);
+                userRepository.save(user);
                 return AuthResponse.builder()
                         .refreshToken(jwtService.generateRefreshToken(user,true,authorizationDetails))
                         .accessToken(jwtService.generateToken(user))

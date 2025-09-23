@@ -20,8 +20,6 @@ services:
     restart: always
     ports:
       - 8099:8099
-      - 8080:8080/udp
-      - 8081:8081/udp
     init: true
     depends_on:
       - db_chillrate

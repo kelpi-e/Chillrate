@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
-public class ExceptionApiHandler {
-    Logger logger= LoggerFactory.getLogger(ExceptionApiHandler.class);
+public class ConfigException {
+    Logger logger= LoggerFactory.getLogger(ConfigException.class);
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ResponseExceptionApp> usernameNotFoundException(UsernameNotFoundException exception){
         //logger.error(exception.getMessage());
@@ -25,8 +25,8 @@ public class ExceptionApiHandler {
     }
     @ExceptionHandler(MailException.class)
     public ResponseEntity<ResponseExceptionApp> mailException(MailException mailException){
-        logger.error(mailException.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseExceptionApp.builder().message(mailException.getMessage()).build());
+        //logger.error(mailException.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseExceptionApp.builder().message(mailException.getMessage()).build());
     }
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ResponseExceptionApp> noSuchFieldError(NoSuchElementException exception){
@@ -36,5 +36,10 @@ public class ExceptionApiHandler {
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ResponseExceptionApp> jwtException(JwtException exception){
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseExceptionApp.builder().message(exception.getMessage()).build());
+    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ResponseExceptionApp> exception(Exception exception){
+        logger.error(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseExceptionApp.builder().message(exception.getMessage()).build());
     }
 }

@@ -28,4 +28,6 @@ public interface AuthService {
     в случае если id не найдет выбрасывает ошибку
      */
     void confirmMail(UUID id) throws UsernameNotFoundException;
+
+    void logout(UUID id);
 }

@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,13 +47,15 @@ public class InfluxDbServiceImpl implements InfluxDBService {
                 var type=sensorToType.get(e.getSensorType());
                 for(var el:e.getListPoint()){
                     if(el.getValue().getClass()!=type){
-                        throw new ClassCastException();
+                        throw new ClassCastException("Not");
                     }
                     el.setUuid(user.toString());
                     el.setSensorType(sensorType);
                     var influxPointApp=PointDtoMapper.INSTANCE.toEntity(el);
-                    uuidToListData.computeIfAbsent(user, k -> new ArrayList<>());
-                    uuidToListData.get(user).add(influxPointApp);
+                    if(influxPointApp.getTime().isAfter(Instant.now().minus(16, ChronoUnit.MINUTES))){
+                        uuidToListData.computeIfAbsent(user, k -> new ArrayList<>());
+                        uuidToListData.get(user).add(influxPointApp);
+                    }
                     sendData(influxPointApp);
                 }
             }
@@ -71,7 +74,7 @@ public class InfluxDbServiceImpl implements InfluxDBService {
 
     @Override
     public List<InfluxPointApp> getData(String typeSensor, UUID userID, RequestInfluxQueryOptions options) {
-        if(options.getStart().equals("-15m")&&options.getAggregate()==null){
+        if(options.getStart().equals("-15m")&&options.getAggregate()==null&&uuidToListData.containsKey(userID)){
             return  uuidToListData.get(userID);
         }
         String query="from(bucket: \""+influxDBClientConfig.getBucket()+"\")\n" +
